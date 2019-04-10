@@ -1,0 +1,17 @@
+﻿Name,PrefabName,IconName,IconParent,Descrption,distanceY,layerMask,position,rotation,scale,parent,color,mesh,buildType,Type
+string,string,string,string,string,float,int,List<float>,List<float>,List<float>,string,List<int>,string,int,ItemType
+名字,预设名称,Icon名称,Icon父对象,描述,距离y,层级(室内2048-室外4096-内外6144),位置,角度,大小,父对象,颜色,纹理,创建方式,类型
+FireEscape,Prefabs/FireEscape,aqck,aqck,安全出口,0,4096,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,0
+XFB,Prefabs/XFB,beng,beng,消防泵,0,2048,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,1
+SNXHS,Prefabs/SNXHS,snxhs,snxhs,室内消火栓,2,2048,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,2
+SBJHQ,Prefabs/SBJHQ,sbjhq,sbjhq,水泵接合器,0,6144,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,3
+DSXHS,Prefabs/DSXHS,dsxhs,dsxhs,地上消火栓,0,4096,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,4
+DXXHS,Prefabs/DXXHS,dxxhs,dxxhs,地下消火栓,0,4096,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,5
+Wall,Prefabs/Wall,wall,wall,墙,2.4,6144,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,1,6
+Intake,Prefabs/Intake,intake,intake,取水口,0,4096,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,7
+HuoGui,Prefabs/HuoGui,HuoGui,HuoGui,货柜,0,2048,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,8
+HuoJia,Prefabs/HuoJia,HuoJia,HuoJia,货架,0,2048,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,9
+LaJiTong,Prefabs/LaJiTong,LaJiTong,LaJiTong,垃圾桶,0,2048,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,10
+ShuShiGui,Prefabs/ShuShiGui,ShuShiGui,ShuShiGui,熟食柜,0,2048,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,11
+YiGui,Prefabs/YiGui,YiGui,YiGui,衣柜,0,2048,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,12
+ZuoYi,Prefabs/ZuoYi,ZuoYi,ZuoYi,座椅,0,2048,0;0;0,0;0;0;1,1;1;1,parent,1;1;1;1,mesh,0,13
