@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 ///  最后更新：2019-04-01 15：30
 ///  联系方式：QQ:359059686
 /// </summary>
-public class UIManager : SingletonMonoBehaviour<UIManager>
+public class UIManager : Singleton<UIManager>
 {
     #region 字段
     // UI画布

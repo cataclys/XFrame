@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 /// 徐振升 2019-02-16
 /// 制作资源更新模块，需要与资源加载模块互动，整理以前的资源管理模块
 /// </summary>
-public class ResourceSystem : SingletonMonoBehaviour<ResourceSystem>
+public class ResourceSystem : Singleton<ResourceSystem>
 {
     //本地路径
     public string LocalUrl

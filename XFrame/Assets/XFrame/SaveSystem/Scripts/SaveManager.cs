@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class SaveManager : SingletonMonoBehaviour<SaveManager>
+public class SaveManager : Singleton<SaveManager>
 {
     void Awake()
     {

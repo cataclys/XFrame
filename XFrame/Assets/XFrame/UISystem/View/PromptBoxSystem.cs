@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PromptBoxSystem : SingletonMonoBehaviour<PromptBoxSystem>
+public class PromptBoxSystem : Singleton<PromptBoxSystem>
 {
     //MessageBox 队列
     Queue<MessageBox> MessageBoxQueue = new Queue<MessageBox>();
