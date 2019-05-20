@@ -7,8 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Library
-{
     /// <summary>
     /// 配置阅读器
     /// </summary>
@@ -31,7 +29,7 @@ namespace Library
         {
             //获取默认应用程序域中的进程可执行文件。
             Type[] types = Assembly.GetCallingAssembly().GetTypes();
-            
+
             foreach (Type type in types)
             {
                 ConfigPath config = type.GetCustomAttribute<ConfigPath>();
@@ -41,8 +39,13 @@ namespace Library
                 object ob = null;
                 if (!type.IsAbstract || !type.IsSealed)
                     ConfigObjects[type] = ob = Activator.CreateInstance(type);
+#if UNITY_STANDALONE
 
-                ReadConfig(type, config.Path, ob);
+                ReadConfig(type, Path.Combine(UnityEngine.Application.dataPath,config.Path), ob);
+#else
+                ReadConfig(type, Path.Combine(UnityEngine.Application.persistentDataPath,config.Path), ob);
+#endif
+
             }
         }
         /// <summary>
@@ -64,7 +67,12 @@ namespace Library
                 if (!type.IsAbstract || !type.IsSealed)
                     ob = ConfigObjects[type];
 
-                SaveConfig(type, config.Path, ob);
+
+#if UNITY_STANDALONE
+                SaveConfig(type, Path.Combine(UnityEngine.Application.dataPath, config.Path), ob);
+#else
+                SaveConfig(type, Path.Combine(UnityEngine.Application.persistentDataPath,config.Path), ob);
+#endif
             }
         }
         /// <summary>
@@ -80,7 +88,7 @@ namespace Library
             PropertyInfo[] properties = type.GetProperties();
 
             Dictionary<string, Dictionary<string, string>> contents = ConfigContents[type] = new Dictionary<string, Dictionary<string, string>>();
-            
+
             string[] lines = File.ReadAllLines(path);
 
             Dictionary<string, string> section = null;
@@ -171,7 +179,7 @@ namespace Library
 
             if (!ConfigContents.TryGetValue(type, out contents))
                 ConfigContents[type] = contents = new Dictionary<string, Dictionary<string, string>>();
-                
+
             if (contents.TryGetValue(section, out entries))
                 return entries.TryGetValue(key, out value);
 
@@ -182,7 +190,7 @@ namespace Library
         }
 
         #region Reads
-        public static Boolean Read(Type type,string section, string key, Boolean value)
+        public static Boolean Read(Type type, string section, string key, Boolean value)
         {
             string entry;
 
@@ -405,7 +413,7 @@ namespace Library
 
             return value;
         }
-        
+
         public static Point Read(Type type, string section, string key, Point value)
         {
             string entry;
@@ -508,9 +516,9 @@ namespace Library
                     int r = int.Parse(match.Groups["R"].Value);
                     int g = int.Parse(match.Groups["G"].Value);
                     int b = int.Parse(match.Groups["B"].Value);
-                    
+
                     return Color.FromArgb(
-                        Math.Min(Byte.MaxValue, Math.Max(Byte.MinValue, a)), 
+                        Math.Min(Byte.MaxValue, Math.Max(Byte.MinValue, a)),
                         Math.Min(Byte.MaxValue, Math.Max(Byte.MinValue, r)),
                         Math.Min(Byte.MaxValue, Math.Max(Byte.MinValue, g)),
                         Math.Min(Byte.MaxValue, Math.Max(Byte.MinValue, b)));
@@ -668,4 +676,3 @@ namespace Library
             Section = section;
         }
     }
-}

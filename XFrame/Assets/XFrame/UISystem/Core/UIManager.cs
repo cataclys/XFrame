@@ -40,14 +40,8 @@ public class UIManager : Singleton<UIManager>
         GameObject gameObject = GameObject.Find("UICanvas");
         if (gameObject == null || gameObject.GetComponent<Canvas>() == null)
         {
-            gameObject = CreateNewUI("UICanvas");
+            gameObject = CreateUICanvas("UICanvas");
         }
-        //if (rootName == "None")
-        //{
-        //    return gameObject.transform;
-        //}
-        //else
-        //{
         Transform transform = gameObject.transform.Find(rootName);
         if (transform == null)
         {
@@ -55,10 +49,9 @@ public class UIManager : Singleton<UIManager>
             transform = gameObject.transform.Find(rootName);
         }
         return transform;
-        //}
     }
     // 创建新的UI目录
-    public static GameObject CreateNewUI(string name)
+    public static GameObject CreateUICanvas(string name)
     {
         GameObject gameObject = new GameObject(name);
         gameObject.layer = LayerMask.NameToLayer("UI");
@@ -74,7 +67,7 @@ public class UIManager : Singleton<UIManager>
         return gameObject;
     }
     // 创建UI子目录
-    private void CreateUIElementRoot(string name, GameObject obj)
+    private static void CreateUIElementRoot(string name, GameObject obj)
     {
         GameObject gameObject = new GameObject(name);
         gameObject.layer = LayerMask.NameToLayer("UI");
@@ -113,13 +106,13 @@ public class UIManager : Singleton<UIManager>
         if (!UIPath.ContainsKey(tempKey))
         {
             //属性标签只能使用常量，暂时放弃
-            //var info = typeof(T);
-            //var classAttribute = (ConfigPath)Attribute.GetCustomAttribute(info, typeof(ConfigPath));
-            //if (classAttribute != null)
-            //{
-            //    //todo 注册UI
-            //    Register<T>(classAttribute.Path);
-            //}
+            var info = typeof(T);
+            var classAttribute = (ConfigPath)Attribute.GetCustomAttribute(info, typeof(ConfigPath));
+            if (classAttribute != null)
+            {
+                //todo 注册UI
+                Register<T>(classAttribute.Path);
+            }
             //else
             //{
             //    // 没有注册先注册
@@ -127,10 +120,13 @@ public class UIManager : Singleton<UIManager>
             //    Debug.LogError($"{typeof(T).ToString()}未添加ConfigPath标签，无法通过配置注册,使用UIView/{typeof(T).ToString()}注册");
             //    //return;
             //}
-            Register<T>($"UIView/{typeof(T).ToString()}");
+            //Register<T>($"UIView/{typeof(T).ToString()}");
         }
         string tempPath = UIPath[tempKey];
         GameObject gameObject = Resources.Load<GameObject>(tempPath);
+
+
+
         gameObject.SetActive(false);
         if (gameObject != null && gameObject.GetComponent<T>() != null)
         {
@@ -157,25 +153,8 @@ public class UIManager : Singleton<UIManager>
 
             Views[typeof(T)].Add(viewName, view);
 
-            //view.OnShow = () => {
-            //    //如果是面板
-            //    if (view.ViewType == UIViewType.Panel)
-            //    {
-            //        if (viewStack.Count > 0)  // 当前栈顶的面板隐藏
-            //        {
-            //            viewStack.Peek().Hide();
-            //        }
-            //        viewStack.Push(view);  // 新面板入栈
-            //    }
-            //};
 
             return view;
-            //if (!Views.ContainsKey(typeof(T)))
-            //{
-            //    Views.Add(typeof(T), new Dictionary<string, UIView>());
-            //}
-
-            //Views.Add(viewName, view);
         }
         else
         {
@@ -317,14 +296,4 @@ public class UIManager : Singleton<UIManager>
     #endregion
 }
 
-[AttributeUsage(AttributeTargets.Class)]
-public class ConfigPath : Attribute
-{
-    public string Path { get; set; }
-
-    public ConfigPath(string path)
-    {
-        Path = path;
-    }
-}
 

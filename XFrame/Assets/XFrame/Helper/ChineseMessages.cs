@@ -1,8 +1,5 @@
-﻿using Library;
-
-namespace Server.Envir.Translations
-{
-    [ConfigPath(@".\Translations\ChineseMessages.ini")]
+﻿
+    [ConfigPath(@"ChineseMessages.ini")]
     public class ChineseMessages
     {
         [ConfigSection("Account")]
@@ -291,4 +288,3 @@ namespace Server.Envir.Translations
         public  string HorseOwner { get; set; } = "You do not own a horse to ride.";
         public  string HorseMap { get; set; } = "You cannot ride your horse on this map.";
     }
-}

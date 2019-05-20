@@ -101,6 +101,17 @@ public class HotUpdate : MonoBehaviour
         ProgressSlider.value = 100;
         LoadingText.text = 100 + "%";
         SceneManager.LoadScene("HotUpdateResLoad");
+        //foreach (var file in ResourceSystem.Instance.verLocal.groups["test1_ios"].listfiles.Values)
+        //{
+        //    if (file.FileName.Contains(".jpg"))
+        //    {
+        //        file.BeginLoadTexture2D((tex, tag) =>
+        //        {
+        //            loadedTexs.Add(tex);
+        //        });
+        //    }
+        //}
+        //ResourceSystem.Instance.verLocal.groups["test1_ios"].listfiles["background"].BeginLoadTexture2D
     }
 
     void Update()

@@ -7,6 +7,8 @@ using UniRx;
 
 /// <summary>
 /// UI页面
+/// 需要动态创建的需要添加预设路径
+/// [ConfigPath("UIView/UIViewLoading")]
 /// </summary>
 public class UIView : UIBehaviour
 {
@@ -18,6 +20,18 @@ public class UIView : UIBehaviour
     public int Z_Index { get { return transform.GetSiblingIndex(); } set { transform.SetSiblingIndex(value); } }
     public Action OnShow;
     public Action OnHide;
+    protected override void Awake()
+    {
+        base.Awake();
+
+    }
+    /// <summary>
+    /// 初始化UIView
+    /// </summary>
+    public virtual void Init()
+    {
+
+    }
     // 显示
     public virtual void Show()
     {

@@ -184,8 +184,6 @@ public class ResourceSystem : Singleton<ResourceSystem>
         {
             s.Write(data, 0, data.Length);
         }
-        //System.IO.File.WriteAllBytes(outfile, data);
-
     }
     //检查版本信息
     public void BeginInit(string remotoURL, Action<Exception> onInit, IEnumerable<string> groups, int taskcount = 1, bool checkRemote = true)
