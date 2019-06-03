@@ -26,7 +26,8 @@ public class SaveSystem
     /// <returns>保存成功ture,保存失败flase</returns>
     /// <param name="fileData">数据类</param>
     /// <param name="filename">文件名称</param>
-    public static bool Save(SaveFile fileData, string filename)
+    public static bool Save<T>(T fileData, string filename)
+        where T : SaveFile
     {
         return SaveToFile(fileData, GetSavePath(filename));
     }
@@ -36,9 +37,10 @@ public class SaveSystem
     /// </summary>
     /// <returns>数据类</returns>
     /// <param name="fileName">文件名称</param>
-    public static SaveFile Load(string fileName)
+    public static T Load<T>(string fileName)
+        where T : SaveFile
     {
-        return LoadFromFile(GetSavePath(fileName));
+        return LoadFromFile<T>(GetSavePath(fileName)) as T;
     }
 
     /// <summary>
@@ -47,7 +49,8 @@ public class SaveSystem
     /// <param name="fileData">数据类</param>
     /// <param name="filePath">文件路径</param>
     /// <returns></returns>
-    private static bool SaveToFile(SaveFile fileData, string filePath)
+    private static bool SaveToFile<T>(T fileData, string filePath)
+        where T : SaveFile
     {
         if (Application.platform == RuntimePlatform.WebGLPlayer)
         {
@@ -107,11 +110,12 @@ public class SaveSystem
     /// </summary>
     /// <param name="filePath">文件路径</param>
     /// <returns>数据类</returns>
-    private static SaveFile LoadFromFile(string filePath)
+    private static T LoadFromFile<T>(string filePath)
+        where T : SaveFile
     {
         if (Application.platform == RuntimePlatform.WebGLPlayer)
         {
-            SaveFile data = null;
+            T data = null;
 
             try
             {
@@ -120,7 +124,7 @@ public class SaveSystem
                     BinaryFormatter binaryFormatter = new BinaryFormatter();
                     FileStream fileStream = File.Open(filePath, FileMode.Open);
 
-                    data = (SaveFile)binaryFormatter.Deserialize(fileStream);
+                    data = (T)binaryFormatter.Deserialize(fileStream);
                     fileStream.Close();
                 }
                 else
@@ -144,7 +148,7 @@ public class SaveSystem
                 {
                     try
                     {
-                        return formatter.Deserialize(stream) as SaveFile;
+                        return formatter.Deserialize(stream) as T;
                     }
                     catch (Exception)
                     {
@@ -166,7 +170,7 @@ public class SaveSystem
                 {
                     try
                     {
-                        return formatter.Deserialize(ms) as SaveFile;
+                        return formatter.Deserialize(ms) as T;
                     }
                     catch (Exception)
                     {
@@ -191,11 +195,12 @@ public class SaveSystem
     /// <returns>保存成功，保存失败</returns>
     /// <param name="fileData">数据类</param>
     /// <param name="filePath">自定义路径</param>
-    public static bool Save(SaveFile fileData, string fileName, string filePath)
+    public static bool Save<T>(T fileData, string fileName, string filePath)
+        where T : SaveFile
     {
         string path = string.Format("{0}/{1}", filePath, fileName);
 
-        return SaveToFile(fileData, path);
+        return SaveToFile<T>(fileData, path);
     }
 
     /// <summary>
@@ -203,11 +208,12 @@ public class SaveSystem
     /// </summary>
     /// <returns>数据类</returns>
     /// <param name="filePath">自定义路径</param>
-    public static SaveFile Load(string fileName, string filePath)
+    public static T Load<T>(string fileName, string filePath)
+        where T: SaveFile
     {
         string path = string.Format("{0}/{1}", filePath, fileName);
 
-        return LoadFromFile(path);
+        return LoadFromFile<T>(path);
     }
     #endregion
 
@@ -249,93 +255,4 @@ public class SaveSystem
     }
     #endregion
 
-    #region Json/Bson存储
-    /// <summary>
-    /// 判断文件是否存在
-    /// </summary>
-    public static bool IsFileExists(string fileName)
-    {
-        return File.Exists(fileName);
-    }
-
-    /// <summary>
-    /// 判断文件夹是否存在
-    /// </summary>
-    public static bool IsDirectoryExists(string fileName)
-    {
-        return Directory.Exists(fileName);
-    }
-
-    /// <summary>
-    /// 创建一个文本文件    
-    /// </summary>
-    /// <param name="fileName">文件路径</param>
-    /// <param name="content">文件内容</param>
-    public static void CreateFile(string fileName, string content)
-    {
-        StreamWriter streamWriter = File.CreateText(fileName);
-        streamWriter.Write(content);
-        streamWriter.Close();
-    }
-
-    /// <summary>
-    /// 创建一个文件夹
-    /// </summary>
-    public static void CreateDirectory(string fileName)
-    {
-        //文件夹存在则返回
-        if (IsDirectoryExists(fileName))
-            return;
-        Directory.CreateDirectory(fileName);
-    }
-
-    public static void SetDataJson(string fileName, object pObject)
-    {
-        using (StreamWriter streamWriter = File.CreateText(fileName))
-        {
-            //将对象序列化为字符串
-            string toSave = JsonConvert.SerializeObject(pObject);
-            streamWriter.Write(toSave);
-        }
-    }
-    public static void SetDataBson(string fileName, object pObject)
-    {
-        using (var stream = new MemoryStream())
-        {
-            var serializer = new JsonSerializer();
-            var writer = new BsonWriter(stream);
-            serializer.Serialize(writer, pObject);
-            stream.Seek(0, SeekOrigin.Begin);
-            using (FileStream fs = new FileStream(fileName, FileMode.Create))
-            {
-                byte[] buff = stream.ToArray();
-                fs.Write(buff, 0, buff.Length);
-//#if UNITY_WEBGL
-//                SyncFiles();
-//#endif
-            }
-        }
-    }
-    public static T GetDataBson<T>(string fileName)
-    {
-        if (!IsFileExists(fileName))
-        {
-            return default(T);
-        }
-        using (var streamReader = File.OpenRead(fileName))
-        {
-            var serializer = new JsonSerializer();
-            var reader = new BsonReader(streamReader);
-            return serializer.Deserialize<T>(reader);
-        }
-    }
-    public static T GetDataJson<T>(string fileName)
-    {
-        using (StreamReader streamReader = File.OpenText(fileName))
-        {
-            string data = streamReader.ReadToEnd();
-            return JsonConvert.DeserializeObject<T>(data);
-        }
-    }
-    #endregion
 }
