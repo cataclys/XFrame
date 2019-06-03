@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
         private static char ColumnSeparator = ',';
         private static char ValueSeparator = ';';
 
-        public static string ConvertCSVtoJSON(string csv)
+        public static string CSV2JSON(string csv)
         {
             //获得所有行
             var lines = csv.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -76,7 +76,7 @@ using System.Runtime.InteropServices;
             return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
         }
 
-        public static string ConvertJSONtoCSV(string json)
+        public static string JSON2CSV(string json)
         {
             try
             {
@@ -108,7 +108,7 @@ using System.Runtime.InteropServices;
             }
         }
         // 键值对转Json
-        public static string ConvertTEXTtoJSON(string txt)
+        public static string TEXT2JSON(string txt)
         {
             //获得所有行
             var lines = txt.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);

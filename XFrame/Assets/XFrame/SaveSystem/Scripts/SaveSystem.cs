@@ -255,4 +255,48 @@ public class SaveSystem
     }
     #endregion
 
+    #region 文本文件存储
+    /// <summary>
+    /// 判断文件是否存在
+    /// </summary>
+    public static bool IsFileExists(string fileName)
+    {
+        return File.Exists(fileName);
+    }
+
+    /// <summary>
+    /// 判断文件夹是否存在
+    /// </summary>
+    public static bool IsDirectoryExists(string fileName)
+    {
+        return Directory.Exists(fileName);
+    }
+
+    /// <summary>
+    /// 创建一个文本文件    
+    /// </summary>
+    /// <param name="fileName">文件路径</param>
+    /// <param name="content">文件内容</param>
+    public static void CreateTextFile(string fileName, string text)
+    {
+        if (IsFileExists(fileName))
+            return;
+        using (StreamWriter streamWriter = File.CreateText(fileName))
+        {
+            streamWriter.Write(text);
+        }
+
+    }
+
+    /// <summary>
+    /// 创建一个文件夹
+    /// </summary>
+    public static void CreateDirectory(string fileName)
+    {
+        //文件夹存在则返回
+        if (IsDirectoryExists(fileName))
+            return;
+        Directory.CreateDirectory(fileName);
+    }
+    #endregion
 }
