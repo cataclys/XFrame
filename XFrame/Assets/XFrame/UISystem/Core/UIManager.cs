@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using XLua;
 using Object = UnityEngine.Object;
 
 /// <summary>
@@ -105,14 +106,14 @@ public class UIManager : Singleton<UIManager>
         Type tempKey = typeof(T);
         if (!UIPath.ContainsKey(tempKey))
         {
-            //属性标签只能使用常量，暂时放弃
-            var info = typeof(T);
-            var classAttribute = (ConfigPath)Attribute.GetCustomAttribute(info, typeof(ConfigPath));
-            if (classAttribute != null)
-            {
-                //todo 注册UI
-                Register<T>(classAttribute.Path);
-            }
+            ////属性标签只能使用常量，暂时放弃
+            //var info = typeof(T);
+            //var classAttribute = (ConfigPath)Attribute.GetCustomAttribute(info, typeof(ConfigPath));
+            //if (classAttribute != null)
+            //{
+            //    //todo 注册UI
+            //    Register<T>(classAttribute.Path);
+            //}
             //else
             //{
             //    // 没有注册先注册
@@ -120,7 +121,7 @@ public class UIManager : Singleton<UIManager>
             //    Debug.LogError($"{typeof(T).ToString()}未添加ConfigPath标签，无法通过配置注册,使用UIView/{typeof(T).ToString()}注册");
             //    //return;
             //}
-            //Register<T>($"UIView/{typeof(T).ToString()}");
+            Register<T>($"UIView/{typeof(T).ToString()}");
         }
         string tempPath = UIPath[tempKey];
         GameObject gameObject = Resources.Load<GameObject>(tempPath);

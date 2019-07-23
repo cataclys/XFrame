@@ -6,7 +6,8 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using DG.Tweening;
 using UniRx;
-
+using XLua;
+[LuaCallCSharp]
 public class MessageBox : UIView
 {
 
@@ -28,7 +29,7 @@ public class MessageBox : UIView
         BtnYes.OnClickAsObservable().Subscribe(a => { UIManager.Instance.DestroyView<MessageBox>(ViewName); }).AddTo(gameObject);
         BtnNo.OnClickAsObservable().Subscribe(a => { UIManager.Instance.DestroyView<MessageBox>(ViewName); }).AddTo(gameObject);
     }
-
+    [LuaCallCSharp]
     public static void Show(string msg)
     {
         Show(msg, Color.white, 18, MessageBoxType.DialogBox_OK, null, null);

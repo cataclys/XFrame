@@ -51,6 +51,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
 
+    public virtual void Init() { }
 
     private void OnApplicationQuit()
     {

@@ -1,0 +1,11 @@
+ManifestFileVersion: 0
+CRC: 3879800525
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: canvas
+      Dependencies:
+        Dependency_0: luascripts
+    Info_1:
+      Name: luascripts
+      Dependencies: {}

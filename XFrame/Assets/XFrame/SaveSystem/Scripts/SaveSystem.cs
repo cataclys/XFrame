@@ -1,16 +1,21 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using Newtonsoft.Json.Bson;
 
 /// <summary>
 /// 存储系统
 /// </summary>
 public class SaveSystem
 {
+
+
 #if UNITY_WEBGL
     [DllImport("__Internal")]
     public static extern void SyncFiles();
@@ -19,226 +24,7 @@ public class SaveSystem
     public static extern void WindowAlert(string message);
 #endif
 
-    #region 持久化路径
-    /// <summary>
-    ///  保存指定名称的数据类为文件
-    /// </summary>
-    /// <returns>保存成功ture,保存失败flase</returns>
-    /// <param name="fileData">数据类</param>
-    /// <param name="filename">文件名称</param>
-    public static bool Save<T>(T fileData, string filename)
-        where T : SaveFile
-    {
-        return SaveToFile(fileData, GetSavePath(filename));
-    }
-
-    /// <summary>
-    /// 读取指定名称的文件
-    /// </summary>
-    /// <returns>数据类</returns>
-    /// <param name="fileName">文件名称</param>
-    public static T Load<T>(string fileName)
-        where T : SaveFile
-    {
-        return LoadFromFile<T>(GetSavePath(fileName)) as T;
-    }
-
-    /// <summary>
-    /// 保存文件到指定路径
-    /// </summary>
-    /// <param name="fileData">数据类</param>
-    /// <param name="filePath">文件路径</param>
-    /// <returns></returns>
-    private static bool SaveToFile<T>(T fileData, string filePath)
-        where T : SaveFile
-    {
-        if (Application.platform == RuntimePlatform.WebGLPlayer)
-        {
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
-            FileStream fileStream;
-
-            try
-            {
-                if (DoesFileExists(filePath))
-                {
-                    File.WriteAllText(filePath, string.Empty);
-                    fileStream = File.Open(filePath, FileMode.Open);
-                }
-                else
-                {
-                    fileStream = File.Create(filePath);
-                }
-
-                binaryFormatter.Serialize(fileStream, fileData);
-                fileStream.Close();
-
-#if UNITY_WEBGL
-                SyncFiles();
-#endif
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                PlatformSafeMessage("Failed to Save: " + e.Message);
-                return false;
-            }
-        }
-        else
-        {
-            Directory.CreateDirectory(Application.streamingAssetsPath);
-
-            BinaryFormatter formatter = new BinaryFormatter();
-
-            using (FileStream stream = new FileStream(filePath, FileMode.Create))
-            {
-                try
-                {
-                    formatter.Serialize(stream, fileData);
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-                return true;
-            }
-        }
-    }
-
-    /// <summary>
-    /// 读取指定路径的文件
-    /// </summary>
-    /// <param name="filePath">文件路径</param>
-    /// <returns>数据类</returns>
-    private static T LoadFromFile<T>(string filePath)
-        where T : SaveFile
-    {
-        if (Application.platform == RuntimePlatform.WebGLPlayer)
-        {
-            T data = null;
-
-            try
-            {
-                if (DoesFileExists(filePath))
-                {
-                    BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    FileStream fileStream = File.Open(filePath, FileMode.Open);
-
-                    data = (T)binaryFormatter.Deserialize(fileStream);
-                    fileStream.Close();
-                }
-                else
-                {
-                    PlatformSafeMessage("文件未找到。");
-                }
-            }
-            catch (Exception e)
-            {
-                PlatformSafeMessage("加载失败: " + e.Message);
-            }
-            return data;
-        }
-        else
-        {
-            if (DoesFileExists(filePath))
-            {
-                BinaryFormatter formatter = new BinaryFormatter();
-
-                using (FileStream stream = new FileStream(filePath, FileMode.Open))
-                {
-                    try
-                    {
-                        return formatter.Deserialize(stream) as T;
-                    }
-                    catch (Exception)
-                    {
-                        Debug.LogWarning("无法打开文件，确认文件未被占用。");
-                        return null;
-                    }
-                }
-            }
-            else if (filePath.Contains("://"))
-            {
-                Debug.Log(" android file: " + filePath);
-
-                WWW www = new WWW(filePath);
-                while (!www.isDone) { }
-
-                BinaryFormatter formatter = new BinaryFormatter();
-
-                using (MemoryStream ms = new MemoryStream(www.bytes))
-                {
-                    try
-                    {
-                        return formatter.Deserialize(ms) as T;
-                    }
-                    catch (Exception)
-                    {
-                        Debug.LogWarning("无法打开文件，确认文件未被占用。");
-                        return null;
-                    }
-                }
-            }
-            else
-            {
-                Debug.LogWarningFormat("{0}不存在", filePath);
-                return null;
-            }
-        }
-    }
-    #endregion
-
-    #region 自定义路径
-    /// <summary>
-    /// 保存自定义路径
-    /// </summary>
-    /// <returns>保存成功，保存失败</returns>
-    /// <param name="fileData">数据类</param>
-    /// <param name="filePath">自定义路径</param>
-    public static bool Save<T>(T fileData, string fileName, string filePath)
-        where T : SaveFile
-    {
-        string path = string.Format("{0}/{1}", filePath, fileName);
-
-        return SaveToFile<T>(fileData, path);
-    }
-
-    /// <summary>
-    /// 读取自定义路径
-    /// </summary>
-    /// <returns>数据类</returns>
-    /// <param name="filePath">自定义路径</param>
-    public static T Load<T>(string fileName, string filePath)
-        where T: SaveFile
-    {
-        string path = string.Format("{0}/{1}", filePath, fileName);
-
-        return LoadFromFile<T>(path);
-    }
-    #endregion
-
     #region  辅助方法
-    private static bool DoesFileExists(string path)
-    {
-        return File.Exists(path);
-    }
-
-    /// <summary>
-    /// 返回文件保存路径
-    /// </summary>
-    /// <param name="name">文件名称</param>
-    /// <returns></returns>
-    private static string GetSavePath(string name)
-    {
-        if (Application.platform == RuntimePlatform.WebGLPlayer)
-        {
-            return string.Format("{0}/{1}.sav", Application.persistentDataPath, name);
-        }
-        else
-        {
-            return Path.Combine(Application.persistentDataPath, name + ".sav");
-        }
-    }
 
     private static void PlatformSafeMessage(string message)
     {
@@ -255,11 +41,105 @@ public class SaveSystem
     }
     #endregion
 
+    #region Json/CSV
+    // 分隔符
+    private static char ColumnSeparator = ',';
+    private static char ValueSeparator = ';';
+
+    private static string CSV2JSON(string csv)
+    {
+        //获得所有行
+        var lines = csv.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+        //第一行为字段名称    id,name
+        //第二行为数据        001,徐振升
+        if (lines.Count() < 2) return "无效的 CSV文件! 第一行为字段名称，第二行为数据";
+
+        //第一行为key
+        var keys = lines[0].Split(ColumnSeparator);
+
+        //第三行为value
+        StringBuilder sb = new StringBuilder();
+        sb.Append("[");
+        for (int i = 1; i < lines.Count(); i++)
+        {
+            if (i != 1) sb.Append(',');
+
+            //列与数值不匹配，返回错误
+            var values = lines[i].Split(ColumnSeparator);
+            if (values.Count() != keys.Count())
+            {
+                return "内容格式有错误";
+            }
+
+            //开始拼接Json
+            sb.Append("{");
+            for (int j = 0; j < values.Count(); j++)
+            {
+                if (j != 0) sb.Append(',');
+
+                // 多值列处理
+                if (values[j].Contains(ValueSeparator))
+                {
+                    var subValues = values[j].Split(ValueSeparator).Select(v => v.Trim()).ToArray();
+                    sb.Append(string.Format("\"{0}\":[\"", keys[j].Trim()));
+                    sb.Append(string.Join("\"" + ValueSeparator + "\"", subValues));
+                    sb.Append("\"]");
+                    continue;
+                }
+
+                sb.Append(string.Format("\"{0}\":\"{1}\"", keys[j].Trim(), values[j].Trim()));
+            }
+            sb.Append("}");
+        }
+        sb.Append("]");
+        string tempString = sb.ToString();
+        //替换tempString中所有;为,
+        tempString = tempString.Replace(';', ',');
+        tempString = tempString.Replace(",\"\"", "");
+        //return tempString;
+        object parsedJson = JsonConvert.DeserializeObject(tempString);
+        return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
+    }
+
+    private static string JSON2CSV(string json)
+    {
+        try
+        {
+            DataTable dt = JsonConvert.DeserializeObject<DataTable>(json);
+            StringBuilder sb = new StringBuilder();
+
+            IEnumerable<string> columnNames = dt.Columns.Cast<DataColumn>().
+                                  Select(column => column.ColumnName);
+            sb.AppendLine(string.Join(ColumnSeparator.ToString(), columnNames));
+
+            foreach (DataRow row in dt.Rows)
+            {
+                IEnumerable<string> fields = row.ItemArray.Select(field =>
+                {
+                    if (field.GetType().IsArray)
+                    {
+                        return string.Join(ValueSeparator.ToString(), field as string[]);
+                    }
+                    return field.ToString();
+                });
+                sb.AppendLine(string.Join(ColumnSeparator.ToString(), fields));
+            }
+
+            return sb.ToString().Trim();
+        }
+        catch (Exception e)
+        {
+            return "无效的JSON";
+        }
+    }
+    #endregion
+
     #region 文本文件存储
     /// <summary>
     /// 判断文件是否存在
     /// </summary>
-    public static bool IsFileExists(string fileName)
+    private static bool IsFileExists(string fileName)
     {
         return File.Exists(fileName);
     }
@@ -267,29 +147,103 @@ public class SaveSystem
     /// <summary>
     /// 判断文件夹是否存在
     /// </summary>
-    public static bool IsDirectoryExists(string fileName)
+    private static bool IsDirectoryExists(string fileName)
     {
         return Directory.Exists(fileName);
     }
 
     /// <summary>
-    /// 创建一个文本文件    
+    /// 保存一个文本文件    
     /// </summary>
-    /// <param name="fileName">文件路径</param>
-    /// <param name="content">文件内容</param>
-    public static void CreateTextFile(string fileName, string text)
+    /// <param name="fileName">文本文件路径</param>
+    /// <param name="text">文本文件内容</param>
+    /// <param name="suffix">文本文件后缀名</param>
+    private static void SaveTextFile(string fileName, string text, string suffix)
     {
-        if (IsFileExists(fileName))
-            return;
-        using (StreamWriter streamWriter = File.CreateText(fileName))
+        //if (IsFileExists(fileName))
+        //    return;
+        string path = Path.Combine(Application.persistentDataPath, fileName + suffix);
+        using (StreamWriter streamWriter = File.CreateText(path))
         {
             streamWriter.Write(text);
         }
-
+#if UNITY_WEBGL
+                SyncFiles();
+#endif
     }
-
+    public static void SaveBsonFile(string fileName, object obj)
+    {
+        var filePath = Path.Combine(Application.persistentDataPath, fileName + ".bson");
+        using (var fs = File.Open(filePath, FileMode.Create))
+        {
+            using (var writer = new BsonWriter(fs))
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(writer, obj);
+            }
+        }
+#if UNITY_WEBGL
+                SyncFiles();
+#endif
+    }
+    public static T LoadBsonFile<T>(string fileName)
+    {
+        var filePath = Path.Combine(Application.persistentDataPath, fileName + ".bson");
+        T obj;
+        using (var fs = File.OpenRead(filePath))
+        {
+            using (var reader = new BsonReader(fs))
+            {
+                var serializer = new JsonSerializer();
+                obj = serializer.Deserialize<T>(reader);
+            }
+        }
+        return obj;
+    }
+    public static string LoadTextFile(string fileName, string suffix)
+    {
+        string path = Path.Combine(Application.persistentDataPath, fileName + suffix);
+        if (IsFileExists(path))
+        {
+            return File.ReadAllText(path);
+        }
+        return null;
+    }
+    public static void SaveText(string fileName, string text)
+    {
+        SaveTextFile(fileName, text, ".txt");
+    }
+    public static void SaveJson(string fileName, object obj)
+    {
+        string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+        SaveTextFile(fileName, json, ".json");
+    }
+    public static void SaveCsv(string fileName, object obj)
+    {
+        string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+        string csv = JSON2CSV(json);
+        SaveTextFile(fileName, csv, ".csv");
+    }
+    public static T LoadJson<T>(string fileName)
+        where T : class
+    {
+        string json = LoadTextFile(fileName, ".json");
+        if (json != null)
+        {
+            T t = JsonConvert.DeserializeObject<T>(json);
+            return t;
+        }
+        return null;
+    }
+    public static T LoadCsv<T>(string fileName)
+    {
+        string csv = LoadTextFile(fileName, ".csv");
+        string json = CSV2JSON(csv);
+        T t = JsonConvert.DeserializeObject<T>(json);
+        return t;
+    }
     /// <summary>
-    /// 创建一个文件夹
+    /// 创建一个目录
     /// </summary>
     public static void CreateDirectory(string fileName)
     {

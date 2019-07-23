@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using UnityEngine.UI;
 using UniRx;
+using XLua;
 
 /// <summary>
 /// UI页面

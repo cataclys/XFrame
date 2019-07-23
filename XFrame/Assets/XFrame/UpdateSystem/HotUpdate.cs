@@ -7,10 +7,10 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// 资源热更新脚本
 /// </summary>
-public class HotUpdate : MonoBehaviour
+public class HotUpdate : UIPanel
 {
     // TODO pc.ver.txt 中没有删除已经删除的问文件
-    private string downloadPath = "http://192.168.1.3/";
+    private string downloadPath = "http://192.168.1.214/hotfix";
 
     public Text UpdateState;
 
@@ -32,7 +32,11 @@ public class HotUpdate : MonoBehaviour
 #else
         "pc";
 #endif
-    void Start()
+    private void Awake()
+    {
+        ILRuntimeManager.Instance.Init();
+    }
+    public override void Start()
     {
         CheckUpdate();
     }
@@ -77,7 +81,7 @@ public class HotUpdate : MonoBehaviour
             else
             {
                 SetState("版本无变化");
-                SceneManager.LoadScene("HotUpdateResLoad");
+                SceneManager.LoadScene("MainScene");
             }
         }
         else
@@ -100,7 +104,7 @@ public class HotUpdate : MonoBehaviour
         SetState("更新完成");
         ProgressSlider.value = 100;
         LoadingText.text = 100 + "%";
-        SceneManager.LoadScene("HotUpdateResLoad");
+        SceneManager.LoadScene("MainScene");
         //foreach (var file in ResourceSystem.Instance.verLocal.groups["test1_ios"].listfiles.Values)
         //{
         //    if (file.FileName.Contains(".jpg"))

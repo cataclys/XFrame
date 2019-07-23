@@ -10,10 +10,4 @@ public class UISystemEditor : Editor
     {
         UISystem.CreateUICanvas("UICanvas");
     }
-
-    [MenuItem("GameObject/UI/UIView")]
-    static void CreateUIView()
-    {
-        UISystem.CreateUICanvas("UICanvas");
-    }
 }

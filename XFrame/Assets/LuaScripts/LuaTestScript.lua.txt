@@ -1,0 +1,19 @@
+local speed = 10
+local testButton = nil
+
+function start()
+
+	testButton= buttonGameObject:GetComponent("Button").onClick:AddListener(
+		function()
+			CS.MessageBox.Show("Hello xlua")
+		end
+	)
+
+end
+
+--function update()
+--end
+
+--function ondestroy()
+--end
+

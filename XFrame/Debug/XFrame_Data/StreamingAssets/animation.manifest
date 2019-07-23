@@ -1,0 +1,25 @@
+ManifestFileVersion: 0
+CRC: 2470896791
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 29a147738878e72fa8ee59ae4b049a8b
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 94b27d020f1db47fdadd7345bed91663
+HashAppended: 0
+ClassTypes:
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/Animation/RobotDown.anim
+- Assets/Animation/RobotRight.anim
+- Assets/Animation/RobotUp.anim
+- Assets/Animation/RobotLeft.anim
+- Assets/Animation/MrClockworkFixed1.controller
+Dependencies:
+- F:/GitHub/XFrame/XFrame/AssetBundles/StandaloneWindows/art
