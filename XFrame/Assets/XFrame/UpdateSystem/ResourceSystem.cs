@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using UnityEngine.Networking;
 /// <summary>
 /// 资源系统
 /// 徐振升 2019-02-16
@@ -59,10 +60,11 @@ public class ResourceSystem : Singleton<ResourceSystem>
         get;
         private set;
     }
-    // 需要完成的任务
+    // 所有任务完成回调
     private Action TaskFinish = null;
-
+    // 需要执行的任务列表
     public Queue<DownTask> task = new Queue<DownTask>();
+    // 正在执行的任务列表
     public List<DownTaskRunner> runnner = new List<DownTaskRunner>();
 
     List<FrameTask> frametask = new List<FrameTask>();
@@ -88,23 +90,25 @@ public class ResourceSystem : Singleton<ResourceSystem>
         {
             runnner.Add(new DownTaskRunner(task.Dequeue()));
         }
+        // 记录已完成的任务
         List<DownTaskRunner> finished = new List<DownTaskRunner>();
         foreach (var r in runnner)
         {
-            if (r.www.isDone)
+            if (r.uwr.isDone)
             {
                 taskState.downloadcount++;
-                //taskState.downloadsize += r.www.bytesDownloaded;
+                taskState.downloadsize = 0;
+                taskState.downloadedSize += r.uwr.downloadedBytes;
                 finished.Add(r);
-                r.task.onload(r.www, r.task.tag);
+                r.task.onload(r.uwr, r.task.tag);
+                r.uwr.Dispose();
             }
             else
             {
-                // todo 单文件下载进度
-                //Debug.Log(r.www.progress);
-                //Debug.Log(r.www.bytesDownloaded);
+                taskState.downloadsize = r.uwr.downloadedBytes;
             }
         }
+        //移除已完成的任务
         foreach (var f in finished)
         {
             runnner.Remove(f);
@@ -130,6 +134,11 @@ public class ResourceSystem : Singleton<ResourceSystem>
             tt();
         }
     }
+    // 读取本地文件
+    public void LoadLoaclFile(string fileName,Action<byte[],string> onload)
+    {
+        verLocal.groups["pc"].listfiles[fileName].BeginLoadBytes(onload);
+    }
     // 设置自定义缓存路径
     public void SetCacheUrl(string url)
     {
@@ -147,7 +156,7 @@ public class ResourceSystem : Singleton<ResourceSystem>
             TaskFinish = finish;
         }
     }
-    public void LoadFromStreamingAssets(string path, string tag, Action<WWW, string> onLoad)
+    public void LoadFromStreamingAssets(string path, string tag, Action<UnityWebRequest, string> onLoad)
     {
         Load(LocalUrl + "/" + path, tag, onLoad);
 
@@ -185,12 +194,12 @@ public class ResourceSystem : Singleton<ResourceSystem>
         frametask.Add(new FrameTaskString(path, tag, onLoad));
         taskState.taskcount++;
     }
-    public void LoadFromRemote(string path, string tag, Action<WWW, string> onLoad)
+    public void LoadFromRemote(string path, string tag, Action<UnityWebRequest, string> onLoad)
     {
         Load(RemoteUrl + "/" + path, tag, onLoad);
 
     }
-    void Load(string path, string tag, Action<WWW, string> onLoad)
+    void Load(string path, string tag, Action<UnityWebRequest, string> onLoad)
     {
         task.Enqueue(new DownTask(path, tag, onLoad));
         taskState.taskcount++;
@@ -330,12 +339,15 @@ public class TaskState
     public int taskcount = 0;
     //public int tasksize;
     public int downloadcount = 0;
-    //public int downloadsize;
+
+    public ulong downloadedSize;
+    public ulong downloadsize;
     public void Clear()
     {
         taskcount = 0;
         //tasksize = 0;
         downloadcount = 0;
+        downloadedSize = 0;
         //downloadsize = 0;
         foreach (var t in ResourceSystem.Instance.task)
         {
@@ -359,10 +371,14 @@ public class TaskState
         return downloadcount + "/" + taskcount;
     }
 }
-//一个下载任务
+
+
+/// <summary>
+/// 
+/// </summary>
 public class DownTask
 {
-    public DownTask(string path, string tag, Action<WWW, string> onload)
+    public DownTask(string path, string tag, Action<UnityWebRequest, string> onload)
     {
         this.path = path;
         this.tag = tag;
@@ -370,7 +386,7 @@ public class DownTask
     }
     public string path;
     public string tag;
-    public Action<WWW, string> onload;
+    public Action<UnityWebRequest, string> onload;
 }
 public enum FrameState
 {
@@ -474,14 +490,19 @@ public class FrameTaskString : FrameTask
         return FrameState.Finish;
     }
 }
-//负责下载
+
+
+/// <summary>
+/// 负责下载
+/// </summary>
 public class DownTaskRunner
 {
     public DownTaskRunner(DownTask task)
     {
         this.task = task;
-        www = new WWW(this.task.path);
+        uwr = UnityWebRequest.Get(this.task.path);
+        uwr.SendWebRequest();
     }
-    public WWW www;
+    public UnityWebRequest uwr;
     public DownTask task;
 }

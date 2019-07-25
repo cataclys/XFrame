@@ -137,16 +137,16 @@ public static class ExampleConfig
     //--------------end 纯lua编程配置参考----------------------------
 
     /***************热补丁可以参考这份自动化配置***************/
-    [Hotfix]
-    static IEnumerable<Type> HotfixInject
-    {
-        get
-        {
-            return (from type in Assembly.Load("Assembly-CSharp").GetExportedTypes()
-                    where type.Namespace == null || !type.Namespace.StartsWith("XLua")
-                    select type);
-        }
-    }
+    //[Hotfix]
+    //static IEnumerable<Type> HotfixInject
+    //{
+    //    get
+    //    {
+    //        return (from type in Assembly.Load("Assembly-CSharp").GetExportedTypes()
+    //                where type.Namespace == null || !type.Namespace.StartsWith("XLua")
+    //                select type);
+    //    }
+    //}
     //--------------begin 热补丁自动化配置-------------------------
     //static bool hasGenericParameter(Type type)
     //{

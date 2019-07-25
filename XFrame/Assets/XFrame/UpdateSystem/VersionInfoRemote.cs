@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class RemoteVersion
 {
@@ -14,20 +15,20 @@ public class RemoteVersion
     public void BeginInit(Action<Exception> onload,IEnumerable<string> _groups)
     {
         int groupcount = 0;
-        Action<WWW, string> onLoadGroup = (www, group) =>
+        Action<UnityWebRequest, string> onLoadGroup = (uwr, group) =>
         {
-            if (string.IsNullOrEmpty(www.error) == false)
+            if (string.IsNullOrEmpty(uwr.error) == false)
             {
-                Debug.LogWarning("下载" + www.url + "错误");
+                Debug.LogWarning("下载" + uwr.url + "错误");
             }
             else
             {
-                string t = www.text;
+                string t = uwr.downloadHandler.text;
                 if (t[0] == 0xFEFF)
                 {
                     t = t.Substring(1);
                 }
-                var rhash = ResourceSystem.Instance.sha1.ComputeHash(www.bytes);
+                var rhash = ResourceSystem.Instance.sha1.ComputeHash(uwr.downloadHandler.data);
                 var shash = Convert.ToBase64String(rhash);
                 if (shash != groups[group].hash)
                 {
@@ -55,15 +56,15 @@ public class RemoteVersion
             }
         };
 
-        Action<WWW,string> onLoadAll = (www,tag) =>
+        Action<UnityWebRequest,string> onLoadAll = (uwr,tag) =>
             {
-                if(string.IsNullOrEmpty(www.error)==false)
+                if(string.IsNullOrEmpty(uwr.error)==false)
                 {
-                    onload(new Exception(www.error));
+                    onload(new Exception(uwr.error));
                     return;
                     //SthWrong;
                 }
-                string t = www.text;
+                string t = uwr.downloadHandler.text;
                 if (t[0] == 0xFEFF)
                 {
                     t = t.Substring(1);

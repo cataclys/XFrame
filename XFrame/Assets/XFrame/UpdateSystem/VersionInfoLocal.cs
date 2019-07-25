@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class LocalVersion
 {
@@ -53,14 +54,14 @@ public class LocalVersion
     void InitEmbedVer(IEnumerable<string> _groups, Action onInitEmbed)
     {
         int groupcount = 0;
-        Action<WWW, string> onLoadGroupInfo = (www, tag) =>
+        Action<UnityWebRequest, string> onLoadGroupInfo = (uwr, tag) =>
         {
-            string t = www.text;
+            string t = uwr.downloadHandler.text;
             if (t.Length > 0 && t[0] == 0xFEFF)
             {
                 t = t.Substring(1);
             }
-            var rhash = ResourceSystem.Instance.sha1.ComputeHash(www.bytes);
+            var rhash = ResourceSystem.Instance.sha1.ComputeHash(uwr.downloadHandler.data);
             var shash = Convert.ToBase64String(rhash);
             if (shash != groups[tag].grouphash)
             {
@@ -75,14 +76,14 @@ public class LocalVersion
             }
         };
 
-        Action<WWW, string> onLoadAll = (www, tag) =>
+        Action<UnityWebRequest, string> onLoadAll = (uwr, tag) =>
             {
-                if (string.IsNullOrEmpty(www.error) == false)
+                if (string.IsNullOrEmpty(uwr.error) == false)
                 {
                     onInitEmbed();
                     return;
                 }
-                string t = www.text;
+                string t = uwr.downloadHandler.text;
                 if (t[0] == 0xFEFF)
                 {
                     t = t.Substring(1);
@@ -259,12 +260,9 @@ public class LocalVersion
     }
     public enum ResState
     {
-        ResState_Error = 0,         //错误
         ResState_UseLocal = 0x01,      //使用本地资源
         ResState_UseDownloaded = 0x02, //使用下载的资源
         ResState_UseRemote = 0x03,      //使用远程的资源
-        //ResState_NeedUpdate = 0x10,    //需要更新10
-        //ResState_InUpdate = 0x20,      //在更新中
     }
     
     public class ResInfo
@@ -304,14 +302,14 @@ public class LocalVersion
         public void Download(Action<ResInfo, Exception> onDown, bool UpdateVerInfo = true)
         {
 
-            Action<WWW, string> load = (WWW, tag) =>
+            Action<UnityWebRequest, string> load = (uwr, tag) =>
             {
                 Exception _err = null;
                 try
                 {
-                    ResourceSystem.Instance.SaveToCache(group + "/" + name, WWW.bytes);
-                    this.size = WWW.bytesDownloaded;//WWW.bytes.Length;
-                    this.hash = Convert.ToBase64String(ResourceSystem.Instance.sha1.ComputeHash(WWW.bytes));
+                    ResourceSystem.Instance.SaveToCache(group + "/" + name, uwr.downloadHandler.data);
+                    this.size = uwr.downloadHandler.data.Length;
+                    this.hash = Convert.ToBase64String(ResourceSystem.Instance.sha1.ComputeHash(uwr.downloadHandler.data));
                     this.state = ResState.ResState_UseDownloaded;
                     this.needupdate = false;
                    
@@ -323,7 +321,7 @@ public class LocalVersion
 
                 if (this.size == 0)
                 {
-                    _err = new Exception("下载size==0"+WWW.url);
+                    _err = new Exception("下载size==0"+uwr.url);
                 }
 
                 if (_err == null && UpdateVerInfo)
@@ -349,11 +347,12 @@ public class LocalVersion
         {
             if ((this.state & ResState.ResState_UseLocal) == ResState.ResState_UseLocal)
             {
-                Action<WWW, string> onloadw = (WWW, tag) =>
+                Action<UnityWebRequest, string> onloadw = (uwr, tag) =>
                 {
                     try
-                    {
-                        onLoad(WWW.assetBundle, tag);
+                    {                       
+                        AssetBundle bundle = (uwr.downloadHandler as DownloadHandlerAssetBundle).assetBundle;
+                        onLoad(bundle, tag);
                     }
                     catch
                     {
@@ -376,9 +375,9 @@ public class LocalVersion
         {
             if ((this.state & ResState.ResState_UseLocal) == ResState.ResState_UseLocal)
             {
-                Action<WWW, string> onloadw = (WWW, tag) =>
+                Action<UnityWebRequest, string> onloadw = (uwr, tag) =>
                     {
-                        onLoad(WWW.bytes, tag);
+                        onLoad(uwr.downloadHandler.data, tag);
                     };
                 ResourceSystem.Instance.LoadFromStreamingAssets(group + "/" + name, group + "/" + name, onloadw);
             }
@@ -391,19 +390,15 @@ public class LocalVersion
                 throw new Exception("这个资源不能加载");
             }
         }
-        public void Test()
-        {
-            Debug.Log("TestFunction");
-        }
         public void BeginLoadTexture2D(Action<Texture2D, string> onLoad)
         {
             if ((this.state & ResState.ResState_UseLocal) == ResState.ResState_UseLocal)
             {
-                Action<WWW, string> onloadw = (WWW, tag) =>
+                Action<UnityWebRequest, string> onloadw = (uwr, tag) =>
                 {
-                    Texture2D tex = new Texture2D(1, 1,TextureFormat.ARGB32,false);
-                    tex.LoadImage(WWW.bytes);
-
+                    //Texture2D tex = new Texture2D(1, 1,TextureFormat.ARGB32,false);
+                    //tex.LoadImage(uwr.bytes);
+                    Texture2D tex = (uwr.downloadHandler as DownloadHandlerTexture).texture;
                     onLoad(tex, tag);
                 };
                 ResourceSystem.Instance.LoadFromStreamingAssets(group + "/" + name, group + "/" + name, onloadw);
@@ -421,10 +416,10 @@ public class LocalVersion
         {
             if ((this.state & ResState.ResState_UseLocal) == ResState.ResState_UseLocal)
             {
-                Action<WWW, string> onloadw = (WWW, tag) =>
+                Action<UnityWebRequest, string> onloadw = (uwr, tag) =>
                 {
 
-                    string t = WWW.text;
+                    string t = uwr.downloadHandler.text;
                     if (t.Length <= 0) return;
                     if (t[0] == 0xFEFF)
                     {

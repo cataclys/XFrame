@@ -9,33 +9,37 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class HotUpdate : UIPanel
 {
-    // TODO pc.ver.txt 中没有删除已经删除的问文件
-    private string downloadPath = "http://192.168.1.214/hotfix";
-
     public Text UpdateState;
 
     public Text LoadingText;
 
     public Slider ProgressSlider;
 
+
+    // TODO pc.ver.txt 中没有删除已经删除的问文件
+    string downloadPath = "http://192.168.1.214/hotfix";
+    // 需要检查的平台
+    List<string> wantdownGroup = new List<string>();
+
     bool indown = false;
 
-    int totalSize = 0;
-    int downloadSize = 0;
+    ulong totalSize = 0;
+
+    ulong downloadSize = 0;
 
     string group =
-#if UNITY_STANDALONE_WIN
+
+#if UNITY_EDITOR
+        "pc";
+#elif UNITY_STANDALONE_WIN
         "pc";
 #elif UNITY_ANDROID
-        "pc";
-#elif UNITY_WEBGL
-        "web";
-#else
-        "pc";
+        "android";
 #endif
-    private void Awake()
+
+    public override void Awake()
     {
-        ILRuntimeManager.Instance.Init();
+        wantdownGroup.Add(group);
     }
     public override void Start()
     {
@@ -44,9 +48,6 @@ public class HotUpdate : UIPanel
     // 检查更新
     public void CheckUpdate()
     {
-        // 需要检查的平台
-        List<string> wantdownGroup = new List<string>();
-        wantdownGroup.Add(group);
         // 初始化
         ResourceSystem.Instance.BeginInit(downloadPath, OnInitFinish, wantdownGroup);
         SetState("检查更新");
@@ -61,8 +62,8 @@ public class HotUpdate : UIPanel
         if (err == null)
         {
             ResourceSystem.Instance.taskState.Clear();
-            List<string> wantdownGroup = new List<string>();
-            wantdownGroup.Add(group);
+            //List<string> wantdownGroup = new List<string>();
+            //wantdownGroup.Add(group);
             var downlist = ResourceSystem.Instance.GetNeedDownloadRes(wantdownGroup);
 
             Debug.Log("服务器版本：" + ResourceSystem.Instance.verRemote.ver);
@@ -73,8 +74,8 @@ public class HotUpdate : UIPanel
                 SetState("发现新版本");
                 foreach (var d in downlist)
                 {
-                    totalSize += d.size;
-                    d.Download(DownloadResInfo);
+                    totalSize += (ulong)d.size;
+                    d.Download(null);
                 }
                 ResourceSystem.Instance.WaitForTaskFinish(DownLoadFinish);
                 indown = true;
@@ -101,9 +102,7 @@ public class HotUpdate : UIPanel
 
     private void DownloadResInfo(LocalVersion.ResInfo resInfo, Exception error)
     {
-        Debug.Log(resInfo.name);
-        Debug.Log(resInfo.FileName);
-        Debug.Log(resInfo.size);
+        
     }
 
     // 资源更新完成
@@ -133,6 +132,8 @@ public class HotUpdate : UIPanel
     {
         if (indown)
         {
+            downloadSize = ResourceSystem.Instance.taskState.downloadedSize + ResourceSystem.Instance.taskState.downloadsize;
+
             ProgressSlider.value = (float)Math.Round(((double)downloadSize / totalSize) * 100, 2);
 
             string showText = "";
@@ -163,7 +164,7 @@ public class HotUpdate : UIPanel
                 //B
                 showText = $"{downloadSize}/{totalSize}B";
             }
-            LoadingText.text = $"{showText}                   {ProgressSlider.value}%";
+            LoadingText.text = $"{showText}  {ProgressSlider.value}%";
         }
     }
 }

@@ -1,0 +1,11 @@
+﻿
+
+<linker>
+
+	<assembly fullname="Assembly-CSharp">
+	    <type fullname="LuaBehaviour" preserve="all"/>
+		<type fullname="MessageBox" preserve="all"/>
+		
+	</assembly>
+
+</linker>
