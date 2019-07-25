@@ -9,24 +9,43 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class HotUpdate : UIPanel
 {
-    public Text UpdateState;
-
-    public Text LoadingText;
-
-    public Slider ProgressSlider;
-
-
     // TODO pc.ver.txt 中没有删除已经删除的问文件
+
+    /// <summary>
+    /// 版本状态
+    /// </summary>
+    public Text UpdateState;
+    /// <summary>
+    /// 下载进度文本
+    /// </summary>
+    public Text LoadingText;
+    /// <summary>
+    /// 下载进度条
+    /// </summary>
+    public Slider ProgressSlider;
+    /// <summary>
+    /// 版本服务器路径
+    /// </summary>
     string downloadPath = "http://192.168.1.214/hotfix";
-    // 需要检查的平台
+    /// <summary>
+    /// 需要更新的组
+    /// </summary>
     List<string> wantdownGroup = new List<string>();
-
+    /// <summary>
+    /// 是否正在下载
+    /// </summary>
     bool indown = false;
-
+    /// <summary>
+    /// 总大小
+    /// </summary>
     ulong totalSize = 0;
-
+    /// <summary>
+    /// 下载大小
+    /// </summary>
     ulong downloadSize = 0;
-
+    /// <summary>
+    /// 更新的平台
+    /// </summary>
     string group =
 
 #if UNITY_EDITOR
@@ -37,6 +56,10 @@ public class HotUpdate : UIPanel
         "android";
 #endif
 
+    const decimal KB = 1024;
+    const decimal MB = KB * 1024;
+    const decimal GB = MB * 1024;
+
     public override void Awake()
     {
         wantdownGroup.Add(group);
@@ -45,18 +68,27 @@ public class HotUpdate : UIPanel
     {
         CheckUpdate();
     }
-    // 检查更新
+    /// <summary>
+    /// 检查更新
+    /// </summary>
     public void CheckUpdate()
     {
         // 初始化
         ResourceSystem.Instance.BeginInit(downloadPath, OnInitFinish, wantdownGroup);
         SetState("检查更新");
     }
+    /// <summary>
+    /// 设置状态
+    /// </summary>
+    /// <param name="str"></param>
     void SetState(string str)
     {
         UpdateState.text = str;
     }
-    // 检查资源完成
+    /// <summary>
+    /// 检查资源完成
+    /// </summary>
+    /// <param name="err"></param>
     void OnInitFinish(Exception err)
     {
         if (err == null)
@@ -99,13 +131,19 @@ public class HotUpdate : UIPanel
             }
         }
     }
-
+    /// <summary>
+    /// 资源文件下载完成回调
+    /// </summary>
+    /// <param name="resInfo"></param>
+    /// <param name="error"></param>
     private void DownloadResInfo(LocalVersion.ResInfo resInfo, Exception error)
     {
         
     }
 
-    // 资源更新完成
+    /// <summary>
+    /// 下载完成
+    /// </summary>
     void DownLoadFinish()
     {
         indown = false;
@@ -113,21 +151,8 @@ public class HotUpdate : UIPanel
         ProgressSlider.value = 100;
         LoadingText.text = 100 + "%";
         SceneManager.LoadScene("MainScene");
-        //foreach (var file in ResourceSystem.Instance.verLocal.groups["test1_ios"].listfiles.Values)
-        //{
-        //    if (file.FileName.Contains(".jpg"))
-        //    {
-        //        file.BeginLoadTexture2D((tex, tag) =>
-        //        {
-        //            loadedTexs.Add(tex);
-        //        });
-        //    }
-        //}
-        //ResourceSystem.Instance.verLocal.groups["test1_ios"].listfiles["background"].BeginLoadTexture2D
     }
-    const decimal KB = 1024;
-    const decimal MB = KB * 1024;
-    const decimal GB = MB * 1024;
+
     void Update()
     {
         if (indown)
