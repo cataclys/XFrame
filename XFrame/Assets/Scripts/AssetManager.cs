@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -13,22 +14,26 @@ public class AssetManager : Singleton<AssetManager>
     {
         StartCoroutine(Load<T>(uri, assetName, unityAction));
     }
-    IEnumerator Load<T>(string bundleUri,string assetName,UnityAction<Object> unityAction)
-        
+    IEnumerator Load<T>(string bundleUri,string assetName,UnityAction<Object> unityAction)        
     {
+        AssetBundle assetBundle = AssetBundle.LoadFromFile($"{Application.streamingAssetsPath}/StandaloneWindows");
+        //读取AssetBundleManifest字段数据
+        AssetBundleManifest manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+        //需要加载的关联bundle
+        string[] dependencies = manifest.GetAllDependencies(assetName);
+        foreach (string dependency in dependencies)
+        {
+            AssetBundle.LoadFromFile(Path.Combine(Application.streamingAssetsPath, dependency));
+        }
+        //加载bundle
         var uwr = UnityWebRequestAssetBundle.GetAssetBundle(bundleUri);
         yield return uwr.SendWebRequest();
 
         AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(uwr);
-        var loadAsset = bundle.LoadAssetAsync<T>(assetName);
-        yield return loadAsset;
 
-        if (unityAction!=null)
-        {
-            unityAction(loadAsset.asset);
-        }
-
-        //bundle.Unload(false);
+        var login = bundle.LoadAssetAsync<GameObject>(assetName);
+        yield return login;
+        Instantiate(login.asset);
     }
 }
 public class AssetInfo

@@ -310,7 +310,7 @@ public class LocalVersion
                 try
                 {
                     ResourceSystem.Instance.SaveToCache(group + "/" + name, WWW.bytes);
-                    this.size = WWW.bytes.Length;
+                    this.size = WWW.bytesDownloaded;//WWW.bytes.Length;
                     this.hash = Convert.ToBase64String(ResourceSystem.Instance.sha1.ComputeHash(WWW.bytes));
                     this.state = ResState.ResState_UseDownloaded;
                     this.needupdate = false;

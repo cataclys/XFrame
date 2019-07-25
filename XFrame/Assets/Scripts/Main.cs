@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimplePatchToolCore;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -30,6 +31,11 @@ public class Main : BaseBehaviour
     //}
     IEnumerator Start()
     {
+        //string item = "1.txt";
+        //string temp = item.Replace(PatchUtils.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        //Debug.Log(temp);
+
+
         AssetBundle assetBundle = AssetBundle.LoadFromFile($"{Application.streamingAssetsPath}/StandaloneWindows");
         //读取AssetBundleManifest字段数据
         AssetBundleManifest manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");

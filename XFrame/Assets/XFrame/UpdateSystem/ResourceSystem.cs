@@ -11,26 +11,50 @@ using System.Security.Cryptography;
 /// </summary>
 public class ResourceSystem : Singleton<ResourceSystem>
 {
-    //本地路径
+    /// <summary>
+    /// 本地路径
+    /// </summary>
     public string LocalUrl
     {
         get;
         private set;
     }
-    //远程路径
+    /// <summary>
+    /// 远程路径
+    /// </summary>
     public string RemoteUrl
     {
         get;
         private set;
     }
-    //缓存地址
-    public string CacheUrl
+    /// <summary>
+    /// 持久化路径
+    /// </summary>
+    public string CacheUrl { get; set; }
+    /// <summary>
+    /// 任务计数
+    /// </summary>
+    public int TaskCount
     {
         get;
         private set;
     }
-    //任务计数
-    public int TaskCount
+    public LocalVersion verLocal
+    {
+        get;
+        private set;
+    }
+    public RemoteVersion verRemote
+    {
+        get;
+        private set;
+    }
+    public SHA1Managed sha1
+    {
+        get;
+        private set;
+    }
+    public TaskState taskState
     {
         get;
         private set;
@@ -38,6 +62,10 @@ public class ResourceSystem : Singleton<ResourceSystem>
     // 需要完成的任务
     private Action TaskFinish = null;
 
+    public Queue<DownTask> task = new Queue<DownTask>();
+    public List<DownTaskRunner> runnner = new List<DownTaskRunner>();
+
+    List<FrameTask> frametask = new List<FrameTask>();
     void Awake()
     {
         //初始化本地URL
@@ -53,29 +81,6 @@ public class ResourceSystem : Singleton<ResourceSystem>
         sha1 = new SHA1Managed();
         taskState = new TaskState();
     }
-    // 等待任务完成
-    public void WaitForTaskFinish(Action finish)
-    {
-        if (TaskFinish != null)
-        {
-            TaskFinish += finish;
-        }
-        else
-        {
-            TaskFinish = finish;
-        }
-    }
-    // 设置自定义缓存路径
-    public void SetCacheUrl(string url)
-    {
-        CacheUrl = url;
-    }
-
-    public TaskState taskState
-    {
-        get;
-        private set;
-    }
     public void Update()
     {
         //处理可多线加载的任务
@@ -89,8 +94,15 @@ public class ResourceSystem : Singleton<ResourceSystem>
             if (r.www.isDone)
             {
                 taskState.downloadcount++;
+                //taskState.downloadsize += r.www.bytesDownloaded;
                 finished.Add(r);
                 r.task.onload(r.www, r.task.tag);
+            }
+            else
+            {
+                // todo 单文件下载进度
+                //Debug.Log(r.www.progress);
+                //Debug.Log(r.www.bytesDownloaded);
             }
         }
         foreach (var f in finished)
@@ -118,12 +130,23 @@ public class ResourceSystem : Singleton<ResourceSystem>
             tt();
         }
     }
-
-
-    public Queue<DownTask> task = new Queue<DownTask>();
-    public List<DownTaskRunner> runnner = new List<DownTaskRunner>();
-
-    List<FrameTask> frametask = new List<FrameTask>();
+    // 设置自定义缓存路径
+    public void SetCacheUrl(string url)
+    {
+        CacheUrl = url;
+    }
+    // 等待任务完成
+    public void WaitForTaskFinish(Action finish)
+    {
+        if (TaskFinish != null)
+        {
+            TaskFinish += finish;
+        }
+        else
+        {
+            TaskFinish = finish;
+        }
+    }
     public void LoadFromStreamingAssets(string path, string tag, Action<WWW, string> onLoad)
     {
         Load(LocalUrl + "/" + path, tag, onLoad);
@@ -299,21 +322,7 @@ public class ResourceSystem : Singleton<ResourceSystem>
         }
         return infos;
     }
-    public LocalVersion verLocal
-    {
-        get;
-        private set;
-    }
-    public RemoteVersion verRemote
-    {
-        get;
-        private set;
-    }
-    public SHA1Managed sha1
-    {
-        get;
-        private set;
-    }
+
 }
 
 public class TaskState
@@ -336,18 +345,18 @@ public class TaskState
         foreach (var r in ResourceSystem.Instance.runnner)
         {
             taskcount++;
-            //downloadsize += r.task.size;
+            //downloadsize += r.www.bytesDownloaded;
             downloadcount++;
         }
 
     }
+    /// <summary>
+    /// 多文件下载总进度
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         return downloadcount + "/" + taskcount;
-    }
-    public float per()
-    {
-        return (float)downloadcount / (float)taskcount;
     }
 }
 //一个下载任务

@@ -237,7 +237,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 1
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -446,11 +446,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: HotUpdate
       objectReference: {fileID: 0}
-    - target: {fileID: 471133826731825510, guid: 2fc1782004cde1440b7a5c471204bbe0,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 471133826731825511, guid: 2fc1782004cde1440b7a5c471204bbe0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -561,51 +556,61 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 471133826731825512, guid: 2fc1782004cde1440b7a5c471204bbe0,
+    - target: {fileID: 1927336341, guid: 2fc1782004cde1440b7a5c471204bbe0, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 0b1c7c0c33d21a042ba1ee438ce4419e,
         type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 471133828177543485, guid: 2fc1782004cde1440b7a5c471204bbe0,
-        type: 3}
-      propertyPath: m_IsActive
+    - target: {fileID: 1927336341, guid: 2fc1782004cde1440b7a5c471204bbe0, type: 3}
+      propertyPath: m_Type
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 471133827764912335, guid: 2fc1782004cde1440b7a5c471204bbe0,
-        type: 3}
-      propertyPath: m_AnchorMax.y
+    - target: {fileID: 1927336341, guid: 2fc1782004cde1440b7a5c471204bbe0, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927336341, guid: 2fc1782004cde1440b7a5c471204bbe0, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927336341, guid: 2fc1782004cde1440b7a5c471204bbe0, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927336341, guid: 2fc1782004cde1440b7a5c471204bbe0, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2fc1782004cde1440b7a5c471204bbe0, type: 3}
---- !u!1 &1927336340 stripped
+--- !u!1 &471133826671296094 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 471133826731825510, guid: 2fc1782004cde1440b7a5c471204bbe0,
+  m_CorrespondingSourceObject: {fileID: 471133826671296094, guid: 2fc1782004cde1440b7a5c471204bbe0,
     type: 3}
   m_PrefabInstance: {fileID: 1927336339}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1927336341
+--- !u!114 &471133826671296097
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1927336340}
+  m_GameObject: {fileID: 471133826671296094}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.23745675, g: 0.25568548, b: 0.2647059, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 0b1c7c0c33d21a042ba1ee438ce4419e, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -613,11 +618,3 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
---- !u!222 &1927336342
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1927336340}
-  m_CullTransparentMesh: 0

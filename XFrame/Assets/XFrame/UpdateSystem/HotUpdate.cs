@@ -20,7 +20,8 @@ public class HotUpdate : UIPanel
 
     bool indown = false;
 
-    float totalSize = 0;
+    int totalSize = 0;
+    int downloadSize = 0;
 
     string group =
 #if UNITY_STANDALONE_WIN
@@ -73,7 +74,7 @@ public class HotUpdate : UIPanel
                 foreach (var d in downlist)
                 {
                     totalSize += d.size;
-                    d.Download(null);
+                    d.Download(DownloadResInfo);
                 }
                 ResourceSystem.Instance.WaitForTaskFinish(DownLoadFinish);
                 indown = true;
@@ -97,6 +98,14 @@ public class HotUpdate : UIPanel
             }
         }
     }
+
+    private void DownloadResInfo(LocalVersion.ResInfo resInfo, Exception error)
+    {
+        Debug.Log(resInfo.name);
+        Debug.Log(resInfo.FileName);
+        Debug.Log(resInfo.size);
+    }
+
     // 资源更新完成
     void DownLoadFinish()
     {
@@ -117,14 +126,44 @@ public class HotUpdate : UIPanel
         //}
         //ResourceSystem.Instance.verLocal.groups["test1_ios"].listfiles["background"].BeginLoadTexture2D
     }
-
+    const decimal KB = 1024;
+    const decimal MB = KB * 1024;
+    const decimal GB = MB * 1024;
     void Update()
     {
         if (indown)
         {
-            ProgressSlider.value = ResourceSystem.Instance.taskState.per() * 100;
-            LoadingText.text = Mathf.RoundToInt(ProgressSlider.value).ToString() + "%";
-            SetState(Mathf.RoundToInt(ResourceSystem.Instance.taskState.per() * totalSize / 1024) + "KB" + "/" + (totalSize / 1024) + "KB");
+            ProgressSlider.value = (float)Math.Round(((double)downloadSize / totalSize) * 100, 2);
+
+            string showText = "";
+
+            if (totalSize > GB)
+            {
+                //GB
+                decimal totalSizeGB = Math.Round(totalSize / GB, 1);
+                decimal currentSizeGB = Math.Round(downloadSize / GB, 1);
+                showText = $"{currentSizeGB}/{totalSizeGB}GB";
+            }
+            else if (totalSize > MB)
+            {
+                //MB
+                decimal totalSizeMB = Math.Round(totalSize / MB, 1);
+                decimal currentSizeMB = Math.Round(downloadSize / MB, 1);
+                showText = $"{currentSizeMB}/{totalSizeMB}MB";
+            }
+            else if (totalSize > KB)
+            {
+                //KB
+                decimal totalSizeKB = Math.Round(totalSize / KB, 1);
+                decimal currentSizeKB = Math.Round(downloadSize / KB, 1);
+                showText = $"{currentSizeKB}/{totalSizeKB}KB";
+            }
+            else
+            {
+                //B
+                showText = $"{downloadSize}/{totalSize}B";
+            }
+            LoadingText.text = $"{showText}                   {ProgressSlider.value}%";
         }
     }
 }
