@@ -4,38 +4,30 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using UnityEngine.UI;
 using UniRx;
-using XLua;
 
 /// <summary>
 /// UI页面
-/// 需要动态创建的需要添加预设路径
-/// [ConfigPath("UIView/UIViewLoading")]
 /// </summary>
-public class UIView : UIBehaviour
+public class UIView : BaseBehaviour
 {
-    //UIView名字
-    public string ViewName;
     //类型
-    public UIViewType ViewType;
-    // 层次
-    public int Z_Index { get { return transform.GetSiblingIndex(); } set { transform.SetSiblingIndex(value); } }
+    public UIViewName ViewName;
     public Action OnShow;
     public Action OnHide;
-    protected override void Awake()
+    public virtual void Awake()
     {
-        base.Awake();
-
+        UIManager.Instance?.Add(ViewName, this);
+    }
+    public virtual void OnDestroy()
+    {
+        UIManager.Instance?.Remove(ViewName);
     }
     /// <summary>
-    /// 初始化UIView
+    /// 显示
     /// </summary>
-    public virtual void Init()
-    {
-
-    }
-    // 显示
     public virtual void Show()
     {
+        Refresh();
         if (!gameObject.activeSelf)
         {
             gameObject.SetActive(true);
@@ -47,7 +39,9 @@ public class UIView : UIBehaviour
             transform.SetAsLastSibling();
         }
     }
-    // 隐藏
+    /// <summary>
+    /// 隐藏
+    /// </summary>
     public virtual void Hide()
     {
         //显示的情况下才隐藏
@@ -60,5 +54,38 @@ public class UIView : UIBehaviour
             }
         }
     }
+    /// <summary>
+    /// 刷新
+    /// </summary>
+    public virtual void Refresh()
+    {
+
+    }
+
+}
+public class UIView<T, TReactive> : UIView
+    where TReactive : ISetData<T>, new()
+{
+    /// <summary>
+    /// 数据
+    /// </summary>
+    protected TReactive DataSource { get; private set; } = new TReactive();
+    /// <summary>
+    /// 显示
+    /// </summary>
+    /// <param name="data"></param>
+    public virtual void Show(T data)
+    {
+        DataSource.SetData(data);
+        base.Show();
+    }
 }
 
+
+//TODO  修改名字为IData 新增GetData方法
+public interface ISetData<T>
+{
+    //新增属性GetData  SetData 时修改此属性的值
+    //T Data { get; set; }
+    void SetData(T t);
+}

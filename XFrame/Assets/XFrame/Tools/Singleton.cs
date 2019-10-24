@@ -1,11 +1,7 @@
 ﻿using UnityEngine;
 
-/// <summary>
-/// Inherit from this base class to create a singleton.
-/// e.g. public class MyClassName : Singleton<MyClassName> {}
-/// http://wiki.unity3d.com/index.php/Singleton
-/// </summary>
-public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+public abstract class Singleton<T> : MonoBehaviour 
+    where T : MonoBehaviour
 {
     // Check to see if we're about to be destroyed.
     private static bool m_ShuttingDown = false;
@@ -51,7 +47,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
 
-    public virtual void Init() { }
+    public abstract void Initialize();
 
     private void OnApplicationQuit()
     {

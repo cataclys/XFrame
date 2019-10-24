@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// 资源热更新脚本
 /// </summary>
-public class HotUpdate : UIPanel
+public class HotUpdate : UIView
 {
     // TODO pc.ver.txt 中没有删除已经删除的问文件
 
@@ -64,7 +64,7 @@ public class HotUpdate : UIPanel
     {
         wantdownGroup.Add(group);
     }
-    public override void Start()
+    public void Start()
     {
         CheckUpdate();
     }
@@ -116,6 +116,7 @@ public class HotUpdate : UIPanel
             {
                 SetState("版本无变化");
                 SceneManager.LoadScene("MainScene");
+               
             }
         }
         else
@@ -151,6 +152,7 @@ public class HotUpdate : UIPanel
         ProgressSlider.value = 100;
         LoadingText.text = 100 + "%";
         SceneManager.LoadScene("MainScene");
+  
     }
 
     void Update()

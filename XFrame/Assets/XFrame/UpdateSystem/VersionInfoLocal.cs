@@ -307,6 +307,7 @@ public class LocalVersion
                 Exception _err = null;
                 try
                 {
+                    //Debug.Log($"name={name},lenth={uwr.downloadHandler.data.Length},url={uwr.uri}");
                     ResourceSystem.Instance.SaveToCache(group + "/" + name, uwr.downloadHandler.data);
                     this.size = uwr.downloadHandler.data.Length;
                     this.hash = Convert.ToBase64String(ResourceSystem.Instance.sha1.ComputeHash(uwr.downloadHandler.data));

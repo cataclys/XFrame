@@ -11,7 +11,7 @@ public class DragUGUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     // Use this for initialization
     void Start()
     {
-        canvas = UIManager.UICanvas.GetComponent<RectTransform>();
+        canvas = UIManager.Instance.GetCanvas().GetComponent<RectTransform>();
         imgRect = GetComponent<RectTransform>();
     }
 

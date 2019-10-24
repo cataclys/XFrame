@@ -1,4 +1,0 @@
-
-=== 07/24/2019 08:15:08 ===
-...Retrieving version info...
-ERROR: could not download version info from server

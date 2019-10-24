@@ -99,6 +99,7 @@ public class ResourceSystem : Singleton<ResourceSystem>
                 taskState.downloadcount++;
                 taskState.downloadsize = 0;
                 taskState.downloadedSize += r.uwr.downloadedBytes;
+                //Debug.Log(r.uwr.downloadHandler.data.Length);
                 finished.Add(r);
                 r.task.onload(r.uwr, r.task.tag);
                 r.uwr.Dispose();
@@ -332,6 +333,10 @@ public class ResourceSystem : Singleton<ResourceSystem>
         return infos;
     }
 
+    public override void Initialize()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class TaskState
