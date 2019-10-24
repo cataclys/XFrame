@@ -5,6 +5,7 @@ using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
+using XFrame.UI;
 
 public class UIViewDatabaseEditor : EditorWindow
 {

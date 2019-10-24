@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
+using XFrame.UI;
 
 public class User
 {

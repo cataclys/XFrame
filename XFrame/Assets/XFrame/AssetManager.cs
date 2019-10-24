@@ -75,7 +75,7 @@ public class AssetManager : Singleton<AssetManager>
         Instantiate(login.asset);
     }
 
-    public override void Initialize()
+    public void Initialize()
     {
         throw new System.NotImplementedException();
     }

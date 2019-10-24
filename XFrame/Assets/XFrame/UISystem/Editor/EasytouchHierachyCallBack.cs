@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEditor;
+using XFrame.UI;
 
 [InitializeOnLoad]
 public class XFrameHierachyCallBack

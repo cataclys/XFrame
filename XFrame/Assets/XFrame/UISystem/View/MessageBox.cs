@@ -6,6 +6,8 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using DG.Tweening;
 using UniRx;
+using XFrame.UI;
+
 public class MessageBox : MonoBehaviour
 {
     //标题

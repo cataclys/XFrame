@@ -332,11 +332,6 @@ public class ResourceSystem : Singleton<ResourceSystem>
         }
         return infos;
     }
-
-    public override void Initialize()
-    {
-        throw new NotImplementedException();
-    }
 }
 
 public class TaskState

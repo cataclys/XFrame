@@ -78,7 +78,7 @@ public class AssetBundleManager : Singleton<AssetBundleManager>
     /// ¼ÓÔØAssetBundleManifest
     /// </summary>
     /// <returns>manifestAssetBundleÃû×Ö</returns>
-    public override void Initialize()
+    public void Initialize()
     {
         string assetBundleManifestName = GetAssetBundleManifestName();
         AssetBundleManifest = LoadAsset<AssetBundleManifest>(assetBundleManifestName, "AssetBundleManifest");

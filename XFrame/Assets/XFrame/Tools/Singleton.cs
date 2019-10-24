@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public abstract class Singleton<T> : MonoBehaviour 
+public class Singleton<T> : MonoBehaviour
     where T : MonoBehaviour
 {
     // Check to see if we're about to be destroyed.
@@ -47,7 +47,10 @@ public abstract class Singleton<T> : MonoBehaviour
         }
     }
 
-    public abstract void Initialize();
+    public void Initialize()
+    {
+        Debug.Log($"初始化{name}");
+    }
 
     private void OnApplicationQuit()
     {
