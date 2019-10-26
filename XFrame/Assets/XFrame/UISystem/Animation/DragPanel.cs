@@ -11,7 +11,7 @@ public class DragPanel : MonoBehaviour, IPointerDownHandler, IDragHandler {
 	private RectTransform parentRectTransform;
 	
 	void Start () {
-		panelRectTransform = transform.parent as RectTransform;
+		panelRectTransform = transform as RectTransform;
 		parentRectTransform = panelRectTransform.parent as RectTransform;
 	}
 	
@@ -34,6 +34,8 @@ public class DragPanel : MonoBehaviour, IPointerDownHandler, IDragHandler {
             }
 
             ClampToWindow();
+            // 显示在最前
+            transform.SetAsLastSibling();
         }
 		
 	}

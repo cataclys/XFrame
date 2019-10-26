@@ -7,98 +7,120 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UniRx;
 using XFrame.UI;
+using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
-public class MessageBox : MonoBehaviour
+public class MessageBox : UIView
 {
     //标题
-    public Text Title;
+    public GameObject Title;
+    public Text TextTitle;
     //内容
-    public Text Content;
+    public GameObject ContentNone;
+    public Text TextContentNone;
+    public GameObject ContentYesNo;
+    public Text TextContentYesNo;
     //OK
-    public GameObject ButtonOK;
-    public Button BtnOK;
+    public Button ButtonOK;
     //YesNo
-    public GameObject ButtonYesNo;
-    public Button BtnYes;
-    public Button BtnNo;
-    //Cancel
-    public GameObject ButtonCancel;
-    public Button BtnCancel;
-    // 预设
-    public static GameObject Current;
+    public Button ButtonYes;
+    public Button ButtonNo;
 
-    public void Awake()
+    public static int MaxCount = 3;
+    //MessageBox 队列
+    public static Queue<MessageBox> MessageBoxQueue = new Queue<MessageBox>();
+
+    public void Start()
     {
-        BtnOK.OnClickAsObservable().Subscribe(click =>
-        {
-            Destroy(gameObject);
-        }).AddTo(gameObject);
-        BtnYes.OnClickAsObservable().Subscribe(click =>
-        {
-            Destroy(gameObject);
-        }).AddTo(gameObject);
-        BtnNo.OnClickAsObservable().Subscribe(click =>
-        {
-            Destroy(gameObject);
-        }).AddTo(gameObject);
-        BtnCancel.OnClickAsObservable().Subscribe(click =>
-        {
-            Destroy(gameObject);
-        }
-        ).AddTo(gameObject);
-    }
-    public static void Show(string message, string caption, MessageBoxButtons buttons = MessageBoxButtons.OK)
-    {
-        // 加载预设
-        GameObject prefab = Resources.Load<GameObject>("MessageBox");
-        // 实例化对象
-        Transform parent = UIManager.Instance.GetCanvas().GetComponent<Transform>();
-        // 设置Box属性
-        if (Current==null)
-        {
-            Current = Instantiate(prefab, parent);
-        }
-        MessageBox box = Current.GetComponent<MessageBox>();
-        box.Title.text = caption;
-        box.Content.text = message;
-        switch (buttons)
-        {
-            case MessageBoxButtons.None:
-                box.ButtonOK.SetActive(false);
-                box.ButtonYesNo.SetActive(false);
-                box.ButtonCancel.SetActive(false);
-                break;
-            case MessageBoxButtons.OK:
-                box.ButtonOK.SetActive(true);
-                box.ButtonYesNo.SetActive(false);
-                box.ButtonCancel.SetActive(false);
-                break;
-            case MessageBoxButtons.YesNo:
-                box.ButtonOK.SetActive(false);
-                box.ButtonYesNo.SetActive(true);
-                box.ButtonCancel.SetActive(false);
-                break;
-            case MessageBoxButtons.Cancel:
-                box.ButtonOK.SetActive(false);
-                box.ButtonYesNo.SetActive(false);
-                box.ButtonCancel.SetActive(true);
-                break;
-        }
+        StartCoroutine(Hiding());
     }
 
-    public static void Close()
+    private IEnumerator Hiding()
     {
-        if (Current!=null)
+        yield return new WaitForSeconds(5f);
+        gameObject.SetActive(false);
+    }
+
+    public override void Awake()
+    {
+        SceneManager.sceneLoaded += (a, b) =>
         {
-            Destroy(Current);
+            MessageBoxQueue.Clear();
+        };
+    }
+    public override void OnDestroy()
+    {
+
+    }
+    public override void Show(object data = null)
+    {
+        gameObject.SetActive(true);
+        // 动画
+        RectTransform rect = transform as RectTransform;
+        rect.DOScale(1, 0.2f);
+        foreach (var item in MessageBoxQueue)
+        {
+            if (item != this)
+            {
+                RectTransform itemRect = item.transform as RectTransform;
+                float offset = itemRect.anchoredPosition.y - 110;
+                float distance = rect.anchoredPosition.y + offset;
+                itemRect.DOAnchorPosY(distance, 0.2f);
+            }
         }
     }
-}
+    public override void Hide()
+    {
 
-public enum MessageBoxButtons
-{
-    None,
-    OK,
-    YesNo,
-    Cancel
+        // 动画
+        Destroy(gameObject);
+    }
+    public static async void Show(string message)
+    {
+        // 如果队列数量大于最大数量等于
+        if (MessageBoxQueue.Count >= MaxCount)
+        {
+            //出站
+            MessageBox dBox = MessageBoxQueue.Dequeue();
+            dBox.Hide();
+        }
+        Task<MessageBox> task = UIManager.Instance.LoadView<MessageBox>("MessageBox");
+        await task;
+        MessageBox box = task.Result;
+        SetDefault(box);
+        box.ContentNone.SetActive(true);
+        box.TextContentNone.text = message;
+        (box.transform as RectTransform).SetAnchor(AnchorPresets.TopCenter);
+        box.Show();
+        MessageBoxQueue.Enqueue(box);
+    }
+    public static async void ShowOk(string message, string caption)
+    {
+        Task<MessageBox> task = UIManager.Instance.LoadView<MessageBox>("Default");
+        await task;
+        MessageBox box = task.Result;
+        SetDefault(box);
+        box.Title.SetActive(true);
+        box.TextTitle.text = caption;
+        box.ContentYesNo.SetActive(true);
+        box.TextContentYesNo.text = message;
+        box.Show();
+    }
+    public static async void ShowYesNo(string message, string caption)
+    {
+        Task<MessageBox> task = UIManager.Instance.LoadView<MessageBox>("Default");
+        await task;
+        MessageBox box = task.Result;
+        box.TextTitle.text = caption;
+        box.TextContentYesNo.text = message;
+
+        box.Show();
+    }
+
+    public static void SetDefault(MessageBox box)
+    {
+        box.Title.SetActive(false);
+        box.ContentNone.SetActive(false);
+        box.ContentYesNo.SetActive(false);
+    }
 }

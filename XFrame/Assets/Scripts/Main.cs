@@ -9,8 +9,6 @@ public class Main : MonoBehaviour
     void Start()
     {
         UIManager.Instance.Show<UIViewStart>();
-        UIManager.Instance.Show<UIViewStart>("页面1");
-        UIManager.Instance.Show<UIViewStart>("页面2");
     }
 
     // Update is called once per frame

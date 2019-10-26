@@ -29,7 +29,7 @@ namespace XFrame.UI
         /// <summary>
         /// UIView预设根目录
         /// </summary>
-        private const string uiViewPrefabsRoot = "Assets/Prefabs/";
+        public const string uiViewPrefabsRoot = "Assets/Prefabs/";
         /// <summary>
         /// 已经创建的UIView对象池
         /// </summary>
@@ -44,7 +44,7 @@ namespace XFrame.UI
             string keyName = FormattingViewName(uiView);
             if (UIViewsPool.ContainsKey(keyName))
             {
-                MessageBox.Show($"[{keyName}]已存在，无法创建", "错误");
+                MessageBox.Show($"[{keyName}]已存在，无法创建");
                 uiView.ViewName = "null";
                 Destroy(uiView.gameObject);
             }
@@ -52,7 +52,7 @@ namespace XFrame.UI
             {
                 UIViewsPool.Add(keyName, uiView);
                 uiView.gameObject.name = $"[{keyName}]";
-                MessageBox.Show($"[{keyName}]", "新增");
+                MessageBox.Show($"[{keyName}]");
             }
         }
         /// <summary>
@@ -70,7 +70,7 @@ namespace XFrame.UI
             {
                 if (!viewName.Contains("null"))
                 {
-                    MessageBox.Show($"[{viewName}]不存在，请确定已经创建该页面", "UIManager.Remove");
+                    MessageBox.Show($"[{viewName}]不存在，请确定已经创建该页面");
                 }
             }
         }
@@ -148,7 +148,7 @@ namespace XFrame.UI
         /// </summary>
         /// <param name="viewName"></param>
         /// <returns></returns>
-        private async Task<UIView> LoadView<T>(string viewName)
+        public async Task<T> LoadView<T>(string viewName)
             where T : UIView
         {
             // 格式化名称
@@ -156,7 +156,7 @@ namespace XFrame.UI
             // 页面池中存在页面直接取出，否则加载
             if (UIViewsPool.ContainsKey(key))
             {
-                return UIViewsPool[key];
+                return UIViewsPool[key] as T;
             }
             else
             {
@@ -166,9 +166,18 @@ namespace XFrame.UI
                 AsyncOperationHandle<GameObject> prefabHandle = Addressables.LoadAssetAsync<GameObject>(prefabPath);
                 await prefabHandle.Task;
                 prefabHandle.Result.SetActive(false);
-                UIView prefabView = prefabHandle.Result.GetComponent<UIView>();
+                T prefabView = prefabHandle.Result.GetComponent<T>();
                 GameObject go = Instantiate(prefabHandle.Result, GetUIRoot(prefabView.UIViewType));
-                UIView view = go.GetComponent<UIView>();
+                switch (prefabView.UIViewType)
+                {
+                    case UIViewType.Panel:
+
+                        break;
+                    case UIViewType.Popup:
+                        go.AddComponent<DragPanel>();
+                        break;
+                }
+                T view = go.GetComponent<T>();
                 view.ViewName = viewName;
                 return view;
             }
@@ -230,7 +239,7 @@ namespace XFrame.UI
             where T : UIView
         {
             //viewName = FormattingViewName<T>(viewName);
-            Task<UIView> task = LoadView<T>(viewName);
+            Task<T> task = LoadView<T>(viewName);
             await task;
             task.Result.Show(data);
         }

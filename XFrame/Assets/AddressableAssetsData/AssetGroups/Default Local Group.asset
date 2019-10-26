@@ -17,6 +17,10 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: d262a501d8567a9448ffdf81a28c9d56
   m_SerializeEntries:
+  - m_GUID: 8a4a8d52f6e2a2d4689544816c9f8ec4
+    m_Address: Assets/Prefabs/MessageBox.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   - m_GUID: f45fbea093bfe5a4fbf2e656c80b4cb7
     m_Address: Assets/Prefabs/UIViewStart.prefab
     m_ReadOnly: 0
