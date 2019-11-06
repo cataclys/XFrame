@@ -8,9 +8,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/XFrame/Scenes/Update.unity
     guid: 199726d99cc9d0b44a4b4176c39a2375
-  - enabled: 1
+  - enabled: 0
     path: Assets/XFrame/Scenes/UISystem.unity
     guid: 9a328044587da7c40a3944ad077c83b3
+  - enabled: 1
+    path: Assets/XFrame/Scripts/Tools/OpenCamera/New Scene.unity
+    guid: c0257f3887bd16b408d27d9bad175359
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 15379256a062e4540b61e84e74560f3e,
       type: 2}
