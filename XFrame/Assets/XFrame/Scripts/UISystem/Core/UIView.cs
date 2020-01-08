@@ -9,15 +9,18 @@ namespace XFrame.UI
     /// <summary>
     /// UI页面
     /// </summary>
-    public class UIView : BaseBehaviour
+    public class UIView : MonoBehaviour
     {
         // 页面名称
         public string ViewName = "Default";
         public UIViewType UIViewType;
         public Action OnShow;
         public Action OnHide;
+        [HideInInspector]
+        public RectTransform rectTransform;
         public virtual void Awake()
         {
+            rectTransform = GetComponent<RectTransform>();
             UIManager.Add(this);
         }
         public virtual void OnDestroy()
@@ -30,16 +33,11 @@ namespace XFrame.UI
         public virtual void Show()
         {
             Refresh();
-            if (!gameObject.activeSelf)
-            {
-                gameObject.SetActive(true);
-                if (OnShow != null)
-                {
-                    OnShow();
-                }
-                // 设置层级到最上层
-                transform.SetAsLastSibling();
-            }
+            if (gameObject.activeSelf) return;
+            gameObject.SetActive(true);
+            OnShow?.Invoke();
+            // 设置层级到最上层
+            transform.SetAsLastSibling();
         }
         /// <summary>
         /// 隐藏
@@ -47,14 +45,15 @@ namespace XFrame.UI
         public virtual void Hide()
         {
             //显示的情况下才隐藏
-            if (gameObject.activeSelf)
-            {
-                gameObject.SetActive(false);
-                if (OnHide != null)
-                {
-                    OnHide();
-                }
-            }
+            if (!gameObject.activeSelf) return;
+            gameObject.SetActive(false);
+            OnHide?.Invoke();
+        }
+        public void ShowHide()
+        {
+            gameObject.SetActive(!gameObject.activeSelf);
+            // 设置层级到最上层
+            transform.SetAsLastSibling();
         }
         /// <summary>
         /// 刷新
@@ -69,27 +68,6 @@ namespace XFrame.UI
     {
         Panel,
         Popup,
-    }
-    //public class UIViewData
-    //{
-
-    //}
-    public class UIView<TModel> : UIView
-        where TModel : new()
-    {
-        /// <summary>
-        /// 数据源
-        /// </summary>
-        protected TModel DataSource { get; set; }
-        /// <summary>
-        /// 显示
-        /// </summary>
-        /// <param name="data"></param>
-        public virtual void Show(TModel data)
-        {
-            DataSource = data;
-            base.Show();
-        }
     }
 
     //TODO  修改名字为IData 新增GetData方法

@@ -47,14 +47,14 @@ public class HotUpdate : UIView
     /// <summary>
     /// 更新的平台
     /// </summary>
-    string group =
+    const string group =
 
-#if UNITY_EDITOR
-        "pc";
-#elif UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN
         "pc";
 #elif UNITY_ANDROID
         "android";
+#elif UNITY_WEBGL
+        "webgl";
 #endif
 
     const decimal KB = 1024;

@@ -26,101 +26,59 @@ public class MessageBox : UIView
     public Button ButtonYes;
     public Button ButtonNo;
 
-    public static int MaxCount = 3;
-    //MessageBox 队列
-    public static Queue<MessageBox> MessageBoxQueue = new Queue<MessageBox>();
+    public static List<MessageBox> messageBoxes = new List<MessageBox>();
 
-    public void Start()
-    {
-        StartCoroutine(Hiding());
-    }
+    public static int count = 3;
+    public int height = 52;
+    //public override void Awake()
+    //{
+    //    rectTransform = GetComponent<RectTransform>();
+    //}
 
-    private IEnumerator Hiding()
-    {
-        yield return new WaitForSeconds(5f);
-        gameObject.SetActive(false);
-    }
+    //public override void OnDestroy()
+    //{
 
-    public override void Awake()
+    //}
+
+    public static void Show(string message)
     {
-        SceneManager.sceneLoaded += (a, b) =>
+        UIManager.Show<MessageBox>(Guid.NewGuid().ToString(), view =>
         {
-            MessageBoxQueue.Clear();
-        };
+            view.SetContentNone(message);
+            //GameManager.Instance.Messages.Enqueue(view);
+        });
     }
-    public override void OnDestroy()
-    {
 
-    }
-    public override void Show()
+
+    public void DoAnimation()
     {
-        gameObject.SetActive(true);
-        // 动画
-        RectTransform rect = transform as RectTransform;
-        rect.DOScale(1, 0.2f);
-        foreach (var item in MessageBoxQueue)
+        rectTransform.SetAnchor(AnchorPresets.TopCenter);
+        rectTransform.DOScale(1, 0.2f);
+        foreach (var item in messageBoxes)
         {
-            if (item != this)
+            RectTransform itemRect = item.transform as RectTransform;
+            float offset = itemRect.anchoredPosition.y - height;
+            float maxOffset = -height * (count);
+            if (offset > maxOffset)
             {
-                RectTransform itemRect = item.transform as RectTransform;
-                float offset = itemRect.anchoredPosition.y - 110;
-                float distance = rect.anchoredPosition.y + offset;
-                itemRect.DOAnchorPosY(distance, 0.2f);
+                itemRect.DOAnchorPosY(offset, 0.2f);
             }
         }
+        messageBoxes.Add(this);
+        StartCoroutine(DestroyGameObject());
     }
-    public override void Hide()
-    {
 
-        // 动画
+    public IEnumerator DestroyGameObject()
+    {
+        yield return new WaitForSeconds(5f);
+        messageBoxes.Remove(this);
         Destroy(gameObject);
     }
-    public static async void Show(string message)
+    public void SetContentNone(string message)
     {
-        // 如果队列数量大于最大数量等于
-        if (MessageBoxQueue.Count >= MaxCount)
-        {
-            //出站
-            MessageBox dBox = MessageBoxQueue.Dequeue();
-            dBox.Hide();
-        }
-        Task<MessageBox> task = UIManager.LoadView<MessageBox>("MessageBox");
-        await task;
-        MessageBox box = task.Result;
-        SetDefault(box);
-        box.ContentNone.SetActive(true);
-        box.TextContentNone.text = message;
-        (box.transform as RectTransform).SetAnchor(AnchorPresets.TopCenter);
-        box.Show();
-        MessageBoxQueue.Enqueue(box);
-    }
-    public static async void ShowOk(string message, string caption)
-    {
-        Task<MessageBox> task = UIManager.LoadView<MessageBox>("Default");
-        await task;
-        MessageBox box = task.Result;
-        SetDefault(box);
-        box.Title.SetActive(true);
-        box.TextTitle.text = caption;
-        box.ContentYesNo.SetActive(true);
-        box.TextContentYesNo.text = message;
-        box.Show();
-    }
-    public static async void ShowYesNo(string message, string caption)
-    {
-        Task<MessageBox> task = UIManager.LoadView<MessageBox>("Default");
-        await task;
-        MessageBox box = task.Result;
-        box.TextTitle.text = caption;
-        box.TextContentYesNo.text = message;
-
-        box.Show();
-    }
-
-    public static void SetDefault(MessageBox box)
-    {
-        box.Title.SetActive(false);
-        box.ContentNone.SetActive(false);
-        box.ContentYesNo.SetActive(false);
+        //Title.SetActive(false);
+        ContentNone.SetActive(true);
+        ContentYesNo.SetActive(false);
+        TextContentNone.text = message;
     }
 }

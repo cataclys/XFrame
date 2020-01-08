@@ -7,7 +7,6 @@ public class Singleton<T> : MonoBehaviour
     private static bool m_ShuttingDown = false;
     private static object m_Lock = new object();
     private static T m_Instance;
-
     /// <summary>
     /// Access singleton instance through this propriety.
     /// </summary>
@@ -49,7 +48,7 @@ public class Singleton<T> : MonoBehaviour
 
     public void Initialize()
     {
-        Debug.Log($"初始化{name}");
+        //Debug.Log($"初始化{name}");
     }
 
     private void OnApplicationQuit()

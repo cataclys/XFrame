@@ -15,7 +15,7 @@ public class UIViewStart : UIView
         {
             count++;
             //MessageBox.Show($"消息{count}");
-            MessageBox.ShowOk("中间消息", "dddddd");
+            //MessageBox.ShowOk("中间消息", "dddddd");
         });
     }
 }

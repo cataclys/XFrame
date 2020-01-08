@@ -15,19 +15,19 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_Data:
     m_SerializedData: []
-  m_GUID: d262a501d8567a9448ffdf81a28c9d56
+  m_GUID: f128836a5003fe14a9d6ea26be182cee
   m_SerializeEntries:
-  - m_GUID: 8a4a8d52f6e2a2d4689544816c9f8ec4
-    m_Address: Assets/Prefabs/MessageBox.prefab
+  - m_GUID: 19e659f206608fe4ab2fafca954b4960
+    m_Address: UIViewWebCamera
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: f45fbea093bfe5a4fbf2e656c80b4cb7
-    m_Address: Assets/Prefabs/UIViewStart.prefab
+  - m_GUID: 479c26d4fe871514a9b880fa0785d7b4
+    m_Address: MessageBox
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0
-  m_Settings: {fileID: 11400000, guid: b0086645dc537074ca44abc6874c3405, type: 2}
+  m_Settings: {fileID: 11400000, guid: 0a53dd1e01665ab43a6ddd65855dfeca, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 143bb1e161319104289e1919bb669b50, type: 2}
-    - {fileID: 11400000, guid: f827b0ecff14fe44f9393fe883a0997c, type: 2}
+    - {fileID: 11400000, guid: fa5c05e062e1eca48a79cce8a873c9f6, type: 2}
+    - {fileID: 11400000, guid: 15c979a79e42a564d9ffb83b6d93fd05, type: 2}

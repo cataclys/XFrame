@@ -1,13 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data;
 using Newtonsoft.Json.Bson;
+using System.Runtime.InteropServices;
 
 /// <summary>
 /// 存储系统
@@ -130,7 +130,7 @@ public class SaveSystem
         }
         catch (Exception e)
         {
-            return "无效的JSON";
+            return e.ToString();
         }
     }
     #endregion

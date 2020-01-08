@@ -104,7 +104,7 @@ using System.Runtime.InteropServices;
             }
             catch (Exception e)
             {
-                return "无效的JSON";
+                return e.ToString();
             }
         }
         // 键值对转Json
